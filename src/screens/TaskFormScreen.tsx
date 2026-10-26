@@ -49,6 +49,7 @@ export default function TaskFormScreen({ route, navigation, onSave }: TaskFormSc
       <TextInput
         style={styles.input}
         placeholder={STRINGS.titlePlaceholder}
+        placeholderTextColor={COLORS.textMuted}
         value={title}
         onChangeText={setTitle}
         maxLength={LIMITS.titleMaxLength}
@@ -61,6 +62,7 @@ export default function TaskFormScreen({ route, navigation, onSave }: TaskFormSc
       <TextInput
         style={[styles.input, styles.multiline]}
         placeholder={STRINGS.descPlaceholder}
+        placeholderTextColor={COLORS.textMuted}
         value={description}
         onChangeText={setDescription}
         multiline

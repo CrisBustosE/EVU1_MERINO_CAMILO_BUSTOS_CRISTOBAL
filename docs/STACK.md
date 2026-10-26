@@ -21,7 +21,7 @@ El proyecto utiliza un conjunto mínimo y controlado de dependencias estándar d
 
 Navegación en pila gestionada por `@react-navigation/native-stack` con dos pantallas principales:
 - `TaskList` (`TaskListScreen`): pantalla principal que lista las tareas, maneja el estado vacío, eliminación con confirmación y el botón flotante (FAB) para agregar tareas.
-- `TaskForm` (`TaskFormScreen`): pantalla modal/formulario para crear o editar una tarea existente, con validaciones y contadores en tiempo real.
+- `TaskForm` (`TaskFormScreen`): pantalla de formulario para crear o editar una tarea existente, con validaciones y contadores en tiempo real.
 
 ## Estado y Persistencia
 

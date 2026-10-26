@@ -74,7 +74,6 @@ export default function TaskItem({ task, onEdit, onDelete }: TaskItemProps) {
           <Text
             style={[styles.title, styles.measuringText]}
             onTextLayout={handleTitleMeasurement}
-            pointerEvents="none"
             accessibilityElementsHidden
             importantForAccessibility="no-hide-descendants"
           >
@@ -84,7 +83,6 @@ export default function TaskItem({ task, onEdit, onDelete }: TaskItemProps) {
             <Text
               style={[styles.description, styles.measuringText]}
               onTextLayout={handleDescMeasurement}
-              pointerEvents="none"
               accessibilityElementsHidden
               importantForAccessibility="no-hide-descendants"
             >
@@ -98,7 +96,7 @@ export default function TaskItem({ task, onEdit, onDelete }: TaskItemProps) {
               style={styles.expandToggle}
               accessibilityRole="button"
               accessibilityState={{ expanded }}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              hitSlop={{ left: 8, right: 8 }}
             >
               <Text style={styles.expandToggleText}>
                 {expanded ? STRINGS.seeLess : STRINGS.seeMore}
@@ -201,9 +199,11 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     opacity: 0,
+    pointerEvents: 'none',
   },
   expandToggle: {
-    marginTop: 6,
+    minHeight: 44,
+    justifyContent: 'center',
     alignSelf: 'flex-start',
   },
   expandToggleText: {
