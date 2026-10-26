@@ -8,12 +8,20 @@
 
 ## Dependencias
 
-- Sin librerías externas de terceros salvo las ya instaladas por Expo.
-- `AsyncStorage` (`@react-native-async-storage/async-storage`) — persistencia entre sesiones.
-- `react-native-safe-area-context` — respeta notch, Dynamic Island y barra de navegación en Android/iOS. Incluida como dependencia transitiva de React Navigation; ya disponible en el proyecto.
-- `react-native-screens` — optimización de navegación; requerida por React Navigation.
+El proyecto utiliza un conjunto mínimo y controlado de dependencias estándar del ecosistema Expo y React Native:
+
+- `@react-navigation/native` y `@react-navigation/native-stack` — infraestructura y gestor de navegación nativa basada en pila.
+- `react-native-screens` — optimización del ciclo de vida y vistas nativas para React Navigation.
+- `react-native-safe-area-context` — dependencia directa para el manejo de insets seguros (notch, Dynamic Island y barra del sistema).
+- `@react-native-async-storage/async-storage` — persistencia asíncrona local entre sesiones.
 - Zustand u otras librerías de estado global **no son necesarias**.
 - **Regla:** no agregar ninguna dependencia sin justificación explícita.
+
+## Navegación
+
+Navegación en pila gestionada por `@react-navigation/native-stack` con dos pantallas principales:
+- `TaskList` (`TaskListScreen`): pantalla principal que lista las tareas, maneja el estado vacío, eliminación con confirmación y el botón flotante (FAB) para agregar tareas.
+- `TaskForm` (`TaskFormScreen`): pantalla modal/formulario para crear o editar una tarea existente, con validaciones y contadores en tiempo real.
 
 ## Estado y Persistencia
 
@@ -21,15 +29,18 @@
 - Persistencia con AsyncStorage: inicialización con acción `LOAD` tras parsear `STORAGE_KEY`, protección con flag `isLoaded` para evitar sobrescrituras de estado inicial vacío.
 - Sin backend ni APIs externas.
 - IDs generados con `Date.now().toString()` o `Math.random()`; sin `uuid` ni similares.
+
 ## Estructura de carpetas
 
+```
 src/
-├── components/     # Componentes reutilizables (UI puro)
-├── screens/        # Una pantalla por archivo
-├── reducers/       # Reducers y tipos de acción
-├── hooks/          # Custom hooks de lógica y estado (e.g., useTasks)
-├── types/          # Interfaces y tipos compartidos
-└── constants/      # Colores, tamaños, textos literales
+├── components/         # Componentes reutilizables (UI puro)
+├── screens/            # Una pantalla por archivo (TaskListScreen, TaskFormScreen)
+├── reducers/           # Reducers y tipos de acción
+├── hooks/              # Custom hooks de lógica y estado (useTasks)
+├── types/              # Interfaces y tipos compartidos (index.ts, navigation.ts)
+└── constants/          # Colores, tamaños, límites y textos literales (STRINGS)
+```
 
 ## Convenciones de código
 
@@ -39,7 +50,7 @@ src/
 - **Comentarios:** breves, solo donde aporten contexto no obvio, en español.
 - **Exportaciones:** `export default` para componentes y pantallas; exportaciones nombradas para tipos y utilidades.
 - **Idioma del código:** todo identificador (variables, funciones, tipos, archivos) en inglés.
-- **Idioma de la UI:** todos los textos visibles para el usuario (labels, placeholders, mensajes de error, botones) en español.
+- **Idioma de la UI:** todos los textos visibles para el usuario (labels, placeholders, mensajes de error, botones) en español y centralizados en `constants` (`STRINGS`).
 
 ## Principios de diseño
 
