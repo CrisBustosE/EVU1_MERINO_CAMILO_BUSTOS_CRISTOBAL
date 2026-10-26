@@ -39,14 +39,6 @@ export function useTasks() {
     AsyncStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks)).catch(() => null);
   }, [tasks, isLoaded]);
 
-  const addTask = useCallback((task: Task) => {
-    dispatch({ type: 'ADD', payload: task });
-  }, []);
-
-  const editTask = useCallback((task: Task) => {
-    dispatch({ type: 'EDIT', payload: task });
-  }, []);
-
   const deleteTask = useCallback((id: string) => {
     dispatch({ type: 'DELETE', payload: id });
   }, []);
@@ -59,8 +51,6 @@ export function useTasks() {
   return {
     tasks,
     isLoaded,
-    addTask,
-    editTask,
     deleteTask,
     saveTask,
   };

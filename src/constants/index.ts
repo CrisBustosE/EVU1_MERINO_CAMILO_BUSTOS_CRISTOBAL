@@ -1,6 +1,6 @@
 export const COLORS = {
-  primary: '#4A90E2',
-  danger: '#E25454',
+  primary: '#2B6CB0',
+  danger: '#C53030',
   background: '#F5F5F5',
   surface: '#FFFFFF',
   text: '#1A1A1A',
@@ -27,6 +27,8 @@ export const STRINGS = {
   appTitle: 'Mis Tareas',
   addTask: 'Nueva tarea',
   editTask: 'Editar tarea',
+  titleLabel: 'Título',
+  descLabel: 'Descripción',
   save: 'Guardar',
   cancel: 'Cancelar',
   delete: 'Eliminar',
