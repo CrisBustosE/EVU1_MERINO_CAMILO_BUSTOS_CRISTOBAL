@@ -35,11 +35,15 @@ export default function TaskListScreen({ navigation, tasks, onDelete }: TaskList
         ListEmptyComponent={
           <Text style={styles.empty}>{STRINGS.emptyList}</Text>
         }
-        contentContainerStyle={styles.list}
+        contentContainerStyle={[
+          styles.list,
+          { paddingBottom: 56 + SPACING.lg + insets.bottom + SPACING.md },
+        ]}
       />
       <TouchableOpacity
         style={[styles.fab, { bottom: SPACING.lg + insets.bottom }]}
         onPress={() => navigation.navigate('TaskForm', {})}
+        accessibilityRole="button"
         accessibilityLabel={STRINGS.addTask}
       >
         <Text style={styles.fabText}>+</Text>
@@ -55,7 +59,6 @@ const styles = StyleSheet.create({
   },
   list: {
     padding: SPACING.md,
-    paddingBottom: 80,
   },
   empty: {
     textAlign: 'center',
@@ -66,7 +69,6 @@ const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
     right: SPACING.md,
-    bottom: SPACING.lg,
     width: 56,
     height: 56,
     borderRadius: 28,

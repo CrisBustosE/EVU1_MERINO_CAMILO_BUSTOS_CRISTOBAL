@@ -43,7 +43,7 @@ export default function TaskFormScreen({ route, navigation, onSave }: TaskFormSc
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={styles.labelRow}>
-        <Text style={styles.label}>Título</Text>
+        <Text style={styles.label}>{STRINGS.titleLabel}</Text>
         <Text style={styles.counter}>{title.length}/{LIMITS.titleMaxLength}</Text>
       </View>
       <TextInput
@@ -55,7 +55,7 @@ export default function TaskFormScreen({ route, navigation, onSave }: TaskFormSc
         autoFocus
       />
       <View style={styles.labelRow}>
-        <Text style={styles.label}>Descripción</Text>
+        <Text style={styles.label}>{STRINGS.descLabel}</Text>
         <Text style={styles.counter}>{description.length}/{LIMITS.descMaxLength}</Text>
       </View>
       <TextInput
