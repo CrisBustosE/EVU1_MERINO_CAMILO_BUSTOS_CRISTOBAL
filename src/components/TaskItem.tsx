@@ -7,18 +7,9 @@ import {
   Modal,
   Pressable,
   LayoutAnimation,
-  Platform,
-  UIManager,
 } from 'react-native';
 import type { Task } from '../types';
 import { COLORS, SPACING, STRINGS } from '../constants';
-
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
 
 interface TaskItemProps {
   task: Task;
@@ -36,49 +27,36 @@ export default function TaskItem({ task, onEdit, onDelete }: TaskItemProps) {
   const [titleTruncated, setTitleTruncated] = useState(false);
   const [descTruncated, setDescTruncated] = useState(false);
 
-  const handleTitleTextLayout = useCallback(
-    (e: TextLayoutEvent) => {
-      if (!expanded) {
-        const lines = e?.nativeEvent?.lines;
-        if (lines && lines.length > 2) {
-          setTitleTruncated(true);
-        }
-      }
-    },
-    [expanded]
-  );
+  const handleTitleMeasurement = useCallback((e: TextLayoutEvent) => {
+    const lines = e?.nativeEvent?.lines;
+    if (lines) {
+      setTitleTruncated(lines.length > 2);
+    }
+  }, []);
 
-  const handleDescTextLayout = useCallback(
-    (e: TextLayoutEvent) => {
-      if (!expanded && task.description) {
-        const lines = e?.nativeEvent?.lines;
-        if (lines && lines.length > 3) {
-          setDescTruncated(true);
-        }
-      }
-    },
-    [expanded, task.description]
-  );
+  const handleDescMeasurement = useCallback((e: TextLayoutEvent) => {
+    const lines = e?.nativeEvent?.lines;
+    if (lines) {
+      setDescTruncated(lines.length > 3);
+    }
+  }, []);
 
   const toggleExpand = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setExpanded((prev) => !prev);
   };
 
-  // Fallback robusto por longitud de caracteres + onTextLayout
-  const isLongTitle = task.title.length > 50;
-  const isLongDesc = !!task.description && task.description.length > 100;
-  const showExpandButton = titleTruncated || descTruncated || isLongTitle || isLongDesc;
+  const showExpandButton = titleTruncated || descTruncated;
 
   return (
     <>
       <View style={styles.container}>
         <View style={styles.contentContainer}>
+          {/* Textos visibles con truncado condicional */}
           <Text
             style={styles.title}
             numberOfLines={expanded ? undefined : 2}
             ellipsizeMode="tail"
-            onTextLayout={handleTitleTextLayout}
           >
             {task.title}
           </Text>
@@ -87,7 +65,28 @@ export default function TaskItem({ task, onEdit, onDelete }: TaskItemProps) {
               style={styles.description}
               numberOfLines={expanded ? undefined : 3}
               ellipsizeMode="tail"
-              onTextLayout={handleDescTextLayout}
+            >
+              {task.description}
+            </Text>
+          ) : null}
+
+          {/* Textos gemelos invisibles para medición precisa sin numberOfLines */}
+          <Text
+            style={[styles.title, styles.measuringText]}
+            onTextLayout={handleTitleMeasurement}
+            pointerEvents="none"
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+          >
+            {task.title}
+          </Text>
+          {task.description ? (
+            <Text
+              style={[styles.description, styles.measuringText]}
+              onTextLayout={handleDescMeasurement}
+              pointerEvents="none"
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
             >
               {task.description}
             </Text>
@@ -182,6 +181,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   contentContainer: {
+    position: 'relative',
     width: '100%',
     marginBottom: SPACING.sm,
   },
@@ -194,6 +194,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.textMuted,
     marginTop: 4,
+  },
+  measuringText: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    opacity: 0,
   },
   expandToggle: {
     marginTop: 6,
