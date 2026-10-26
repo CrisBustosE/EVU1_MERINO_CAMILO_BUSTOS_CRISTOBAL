@@ -35,7 +35,7 @@ Cada tarea contiene:
 ## Criterios de aceptación
 
 1. La app arranca sin errores en Expo Go.
-2. Se puede agregar una tarea con título y descripción; aparece en la lista inmediatamente.
+2. Se puede agregar una tarea con título y, opcionalmente, descripción; aparece en la lista inmediatamente.
 3. Se puede editar cualquier tarea existente y los cambios se reflejan en la lista.
 4. Al pulsar "Eliminar", aparece un modal de confirmación; solo se borra la tarea si el usuario confirma.
 5. Las tareas persisten al cerrar y reabrir la aplicación con `AsyncStorage`.
