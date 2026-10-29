@@ -34,10 +34,10 @@ Navegación en pila gestionada por `@react-navigation/native-stack` con dos pant
 
 ```
 src/
-├── components/         # Componentes reutilizables (UI puro)
+├── components/         # Componentes reutilizables (UI puro: TaskItem, SortMenu)
 ├── screens/            # Una pantalla por archivo (TaskListScreen, TaskFormScreen)
 ├── reducers/           # Reducers y tipos de acción
-├── hooks/              # Custom hooks de lógica y estado (useTasks)
+├── hooks/              # Custom hooks de lógica y estado (useTasks, useSortedTasks)
 ├── types/              # Interfaces y tipos compartidos (index.ts, navigation.ts)
 └── constants/          # Colores, tamaños, límites y textos literales (STRINGS)
 ```
