@@ -43,4 +43,9 @@ export const STRINGS = {
   deleteConfirm: 'Sí, eliminar',
   seeMore: 'Ver más',
   seeLess: 'Ver menos',
+  sort: 'Ordenar',
+  sortMenuTitle: 'Ordenar tareas',
+  sortNewest: 'Más recientes primero',
+  sortOldest: 'Más antiguas primero',
+  sortAlphabetical: 'Alfabético (A-Z)',
 } as const;
