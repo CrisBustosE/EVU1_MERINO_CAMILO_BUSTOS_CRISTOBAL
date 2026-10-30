@@ -109,6 +109,7 @@ export default function TaskItem({ task, onEdit, onDelete }: TaskItemProps) {
           <TouchableOpacity
             style={[styles.btn, styles.editBtn]}
             onPress={() => onEdit(task)}
+            accessibilityRole="button"
             accessibilityLabel={`${STRINGS.edit} ${task.title}`}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
@@ -117,6 +118,7 @@ export default function TaskItem({ task, onEdit, onDelete }: TaskItemProps) {
           <TouchableOpacity
             style={[styles.btn, styles.deleteBtn]}
             onPress={() => setConfirmVisible(true)}
+            accessibilityRole="button"
             accessibilityLabel={`${STRINGS.delete} ${task.title}`}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
@@ -149,6 +151,7 @@ export default function TaskItem({ task, onEdit, onDelete }: TaskItemProps) {
               <TouchableOpacity
                 style={[styles.btn, styles.cancelDialogBtn]}
                 onPress={() => setConfirmVisible(false)}
+                accessibilityRole="button"
               >
                 <Text style={styles.cancelDialogText}>{STRINGS.cancel}</Text>
               </TouchableOpacity>
@@ -158,6 +161,7 @@ export default function TaskItem({ task, onEdit, onDelete }: TaskItemProps) {
                   setConfirmVisible(false);
                   onDelete(task.id);
                 }}
+                accessibilityRole="button"
               >
                 <Text style={styles.btnText}>{STRINGS.deleteConfirm}</Text>
               </TouchableOpacity>

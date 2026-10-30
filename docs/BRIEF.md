@@ -11,6 +11,7 @@ Aplicación móvil desarrollada en React Native con Expo que permite a los usuar
 - **Eliminar tarea:** el usuario puede borrar una tarea de la lista; se solicita confirmación previa mediante modal interactivo que muestra el nombre de la tarea en negrita (limitado a 2 líneas).
 - **Visualizar lista:** todas las tareas se muestran en una lista con su título (hasta 2 líneas con puntos suspensivos) y descripción (hasta 3 líneas con puntos suspensivos).
 - **Expansión inline:** control interactivo "Ver más" / "Ver menos" que aparece únicamente cuando el texto de una tarea se encuentra truncado, permitiendo expandir y colapsar su contenido sin salir de la lista.
+- **Ordenar tareas:** menú accesible desde el header (botón "Ordenar", visible con 2 o más tareas) con tres criterios: más recientes primero (por defecto), más antiguas primero y alfabético (A-Z).
 - **Estado vacío:** cuando no existen tareas registradas, se presenta un mensaje descriptivo indicando "No hay tareas. ¡Agrega una!".
 
 ## Modelo de datos
@@ -41,6 +42,6 @@ Cada tarea contiene:
 5. Las tareas persisten al cerrar y reabrir la aplicación con `AsyncStorage`.
 6. La interfaz es responsive y usable en dispositivos de distintos tamaños.
 7. Los elementos flotantes (FAB) no quedan ocultos por el notch, Dynamic Island ni la barra de navegación del sistema.
-8. Validación y límites: el título no puede estar vacío tras aplicar `trim()`; se respetan los límites de 80 caracteres en título y 300 en descripción con contador visible.
+8. Validación y límites: el título no puede estar vacío tras aplicar `trim()` (se muestra un mensaje de error bajo el campo, sin diálogos); se respetan los límites de 80 caracteres en título y 300 en descripción con contador visible.
 9. Truncado y expansión: en la lista, textos largos se truncan con `numberOfLines` y `ellipsizeMode="tail"`, mostrando "Ver más" / "Ver menos" solo si el texto está truncado.
 10. Accesibilidad y contraste: contraste de texto mínimo de 4.5:1 (WCAG AA) y áreas táctiles de al menos 44 × 44 dp con roles y estados accesibles.

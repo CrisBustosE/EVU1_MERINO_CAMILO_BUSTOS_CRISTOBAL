@@ -5,7 +5,6 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
@@ -22,10 +21,16 @@ export default function TaskFormScreen({ route, navigation, onSave }: TaskFormSc
   const existing = route.params?.task;
   const [title, setTitle] = useState(existing?.title ?? '');
   const [description, setDescription] = useState(existing?.description ?? '');
+  const [titleError, setTitleError] = useState(false);
+
+  function handleTitleChange(text: string) {
+    setTitle(text);
+    if (titleError && text.trim()) setTitleError(false);
+  }
 
   function handleSave() {
     if (!title.trim()) {
-      Alert.alert('', STRINGS.titleRequired);
+      setTitleError(true);
       return;
     }
     const task: Task = {
@@ -47,14 +52,20 @@ export default function TaskFormScreen({ route, navigation, onSave }: TaskFormSc
         <Text style={styles.counter}>{title.length}/{LIMITS.titleMaxLength}</Text>
       </View>
       <TextInput
-        style={styles.input}
+        style={[styles.input, titleError && styles.inputError]}
         placeholder={STRINGS.titlePlaceholder}
         placeholderTextColor={COLORS.textMuted}
         value={title}
-        onChangeText={setTitle}
+        onChangeText={handleTitleChange}
         maxLength={LIMITS.titleMaxLength}
         autoFocus
+        accessibilityLabel={STRINGS.titleLabel}
       />
+      {titleError && (
+        <Text style={styles.errorText} accessibilityLiveRegion="polite" accessibilityRole="alert">
+          {STRINGS.titleRequired}
+        </Text>
+      )}
       <View style={styles.labelRow}>
         <Text style={styles.label}>{STRINGS.descLabel}</Text>
         <Text style={styles.counter}>{description.length}/{LIMITS.descMaxLength}</Text>
@@ -68,15 +79,21 @@ export default function TaskFormScreen({ route, navigation, onSave }: TaskFormSc
         multiline
         numberOfLines={4}
         maxLength={LIMITS.descMaxLength}
+        accessibilityLabel={STRINGS.descLabel}
       />
       <View style={styles.btnRow}>
         <TouchableOpacity
           style={[styles.btn, styles.cancelBtn]}
           onPress={() => navigation.goBack()}
+          accessibilityRole="button"
         >
           <Text style={styles.cancelText}>{STRINGS.cancel}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.btn, styles.saveBtn]} onPress={handleSave}>
+        <TouchableOpacity
+          style={[styles.btn, styles.saveBtn]}
+          onPress={handleSave}
+          accessibilityRole="button"
+        >
           <Text style={styles.saveText}>{STRINGS.save}</Text>
         </TouchableOpacity>
       </View>
@@ -116,6 +133,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: COLORS.text,
     minHeight: 48,
+  },
+  inputError: {
+    borderColor: COLORS.danger,
+    borderWidth: 2,
+  },
+  errorText: {
+    color: COLORS.danger,
+    fontSize: 13,
+    marginTop: 4,
   },
   multiline: {
     minHeight: 100,
