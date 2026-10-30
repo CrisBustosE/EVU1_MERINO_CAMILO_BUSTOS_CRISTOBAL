@@ -276,3 +276,7 @@ Usamos agentes de IA como herramienta de apoyo durante el desarrollo, siguiendo 
 La revisión humana y las pruebas en un dispositivo real fueron parte de cada etapa. Por ejemplo, al probar con Expo Go en un teléfono Android detectamos que el botón "Ver más" no aparecía en tareas largas. Nuestra hipótesis fue que, con `numberOfLines`, el evento `onTextLayout` no informaba las líneas del texto completo, así que pedimos al agente medir con un texto gemelo invisible sin `numberOfLines`. Después del cambio, comprobamos en el teléfono que el botón aparecía solo en los textos largos.
 
 También medimos el contraste de los colores: el blanco sobre el azul y el rojo originales daba 3,29:1 y 3,73:1, por debajo del mínimo de 4,5:1 definido en `docs/STACK.md`. Se oscurecieron a `#2B6CB0` y `#C53030` (5,42:1 y 5,47:1). Cada cambio se verificó con `npx tsc --noEmit` y revisado a través de Pull Requests en GitHub antes de integrarse a la rama principal.
+
+## Coevaluación del equipo
+
+El documento de autoevaluación y coevaluación del trabajo en equipo se encuentra disponible en el repositorio en la ruta [`docs/Coevaluación_EVA1.pdf`](docs/Coevaluaci%C3%B3n_EVA1.pdf).
