@@ -41,9 +41,9 @@ Escanear el código QR con Expo Go (Android) o con la cámara (iOS), con el celu
 
 1. **Entorno:** instalación de Node.js, Git, VS Code y Expo Go. No requiere una CLI global: Expo se ejecuta con `npx`.
 2. **Creación del proyecto:** `npx create-expo-app --template blank-typescript`, y luego se instalaron React Navigation y AsyncStorage con `npx expo install`.
-3. **Especificación:** antes de programar definimos los requisitos y criterios de aceptación en [`docs/BRIEF.md`](docs/BRIEF.md) y las convenciones en [`docs/STACK.md`](docs/STACK.md).
+3. **Especificación:** antes de programar definimos los requisitos y criterios de aceptación en [`docs/1_BRIEF.md`](docs/1_BRIEF.md) y las convenciones en [`docs/3_STACK.md`](docs/3_STACK.md).
 4. **Desarrollo:** trabajo en ramas y Pull Requests en GitHub, con commits según Conventional Commits.
-5. **Verificación:** `npx tsc --noEmit` sin errores y pruebas en un dispositivo con Expo Go.
+5. **Verificación:** `npx tsc --noEmit` sin errores, `npm test` (Jest, 11 pruebas pasando) y pruebas en un dispositivo con Expo Go.
 
 ## Estructura del proyecto
 
@@ -55,8 +55,9 @@ src/
 ├── reducers/            taskReducer: acciones LOAD, ADD, EDIT, DELETE
 ├── hooks/               useTasks (estado + persistencia), useSortedTasks
 ├── types/               Task, SortOrder, tipos de navegación
-└── constants/           Colores, espaciados, límites y textos
-docs/                    BRIEF.md, STACK.md y capturas
+├── constants/           Colores, espaciados, límites y textos
+└── utils/               migrateTasks (migración de datos de la Unidad 1)
+docs/                    1_BRIEF.md, 2_DOMAIN.md, 3_STACK.md, 4_DESIGN.md, 5_MVP.md y capturas
 ```
 
 ## Componentes principales
@@ -145,16 +146,7 @@ Encapsulan la interacción con `AsyncStorage`, la suscripción a eventos y las t
     async function loadTasks() {
       try {
         const raw = await AsyncStorage.getItem(STORAGE_KEYS.tasks);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed)) {
-            dispatch({ type: 'LOAD', payload: parsed });
-          } else {
-            dispatch({ type: 'LOAD', payload: [] });
-          }
-        } else {
-          dispatch({ type: 'LOAD', payload: [] });
-        }
+        dispatch({ type: 'LOAD', payload: migrateTasks(raw ? JSON.parse(raw) : []) });
       } catch {
         dispatch({ type: 'LOAD', payload: [] });
       } finally {
@@ -216,9 +208,9 @@ export function useSortedTasks(tasks: Task[], order: SortOrder): Task[] {
     const copy = [...tasks];
     switch (order) {
       case 'newest':
-        return copy.sort((a, b) => compareByCreation(b, a));
+        return copy.sort((a, b) => b.createdAt - a.createdAt);
       case 'oldest':
-        return copy.sort(compareByCreation);
+        return copy.sort((a, b) => a.createdAt - b.createdAt);
       case 'alphabetical':
         return copy.sort((a, b) => a.title.localeCompare(b.title, 'es', { sensitivity: 'base' }));
     }
@@ -226,7 +218,7 @@ export function useSortedTasks(tasks: Task[], order: SortOrder): Task[] {
 }
 ```
 
-*Nota:* `compareByCreation` compara los identificadores generados con `Date.now()` (`Number(a.id) - Number(b.id)`).
+*Nota:* Los casos "newest" y "oldest" ordenan por `createdAt`; las tareas de la Unidad 1 (sin `createdAt`) se migran con `Number(id)` en `migrateTasks`.
 
 ### Persistencia segura con flag `isLoaded` (`src/hooks/useTasks.ts`)
 Un `useEffect` de guardado condicionado estrictamente al flag `isLoaded` evita la pérdida accidental de información al iniciar la aplicación.
@@ -271,11 +263,11 @@ En nuestras pruebas en Android, observamos que al definir `numberOfLines`, el ev
 
 ## Uso de agentes de IA
 
-Usamos agentes de IA como herramienta de apoyo durante el desarrollo, siguiendo una metodología estructurada: antes de escribir cualquier línea de código, establecimos el flujo de control en [`AGENTS.md`](AGENTS.md), obligando a que cualquier intervención leyera y respetara estrictamente los requisitos de [`docs/BRIEF.md`](docs/BRIEF.md) y las convenciones arquitectónicas de [`docs/STACK.md`](docs/STACK.md). 
+Usamos agentes de IA como herramienta de apoyo durante el desarrollo, siguiendo una metodología estructurada: antes de escribir cualquier línea de código, establecimos el flujo de control en [`AGENTS.md`](AGENTS.md), obligando a que cualquier intervención leyera y respetara estrictamente los requisitos de [`docs/1_BRIEF.md`](docs/1_BRIEF.md) y las convenciones arquitectónicas de [`docs/3_STACK.md`](docs/3_STACK.md).
 
 La revisión humana y las pruebas en un dispositivo real fueron parte de cada etapa. Por ejemplo, al probar con Expo Go en un teléfono Android detectamos que el botón "Ver más" no aparecía en tareas largas. Nuestra hipótesis fue que, con `numberOfLines`, el evento `onTextLayout` no informaba las líneas del texto completo, así que pedimos al agente medir con un texto gemelo invisible sin `numberOfLines`. Después del cambio, comprobamos en el teléfono que el botón aparecía solo en los textos largos.
 
-También medimos el contraste de los colores: el blanco sobre el azul y el rojo originales daba 3,29:1 y 3,73:1, por debajo del mínimo de 4,5:1 definido en `docs/STACK.md`. Se oscurecieron a `#2B6CB0` y `#C53030` (5,42:1 y 5,47:1). Cada cambio se verificó con `npx tsc --noEmit` y revisado a través de Pull Requests en GitHub antes de integrarse a la rama principal.
+También medimos el contraste de los colores: el blanco sobre el azul y el rojo originales daba 3,29:1 y 3,73:1, por debajo del mínimo de 4,5:1 definido en `docs/4_DESIGN.md`. Se oscurecieron a `#2B6CB0` y `#C53030` (5,42:1 y 5,47:1). Cada cambio se verificó con `npx tsc --noEmit` y revisado a través de Pull Requests en GitHub antes de integrarse a la rama principal.
 
 ## Coevaluación del equipo
 

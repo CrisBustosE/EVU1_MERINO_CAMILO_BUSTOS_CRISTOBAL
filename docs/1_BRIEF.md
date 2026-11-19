@@ -1,5 +1,7 @@
 # Brief: Aplicación de Lista de Tareas (To-Do List)
 
+> Orden de lectura: este documento es el **1** de 5. Ver [`AGENTS.md`](../AGENTS.md) para el orden completo.
+
 ## Descripción general
 
 Aplicación móvil desarrollada en React Native con Expo que permite a los usuarios gestionar sus tareas pendientes de forma sencilla e intuitiva.
@@ -23,25 +25,14 @@ Aplicación móvil desarrollada en React Native con Expo que permite a los usuar
 
 - **Foto adjunta (cámara y galería):** al crear o editar una tarea, el usuario puede adjuntar una foto tomada con la cámara o elegida de la galería (`expo-image-picker`). La imagen se copia a la carpeta de documentos de la app (`expo-file-system`) para que persista aunque el original se borre; la tarea guarda la URI de esa copia. La foto puede reemplazarse o quitarse. Al quitarla, reemplazarla o eliminar la tarea, se borra el archivo copiado. En la lista se muestra una miniatura.
 - **Ubicación (GPS):** al crear una tarea, el usuario puede registrar su ubicación actual (`expo-location`, solo permiso en primer plano). Se obtiene una dirección legible con `reverseGeocodeAsync`; si la geocodificación falla, se conservan las coordenadas y se omite la dirección. La ubicación se puede quitar antes de guardar y es de solo lectura al editar. Desde la lista y el formulario se puede abrir en la app de mapas del dispositivo mediante `Linking`. Si el GPS no responde dentro de un tiempo límite (timeout), se informa el error y el usuario puede reintentar o guardar sin ubicación.
+  - **Por qué a pedido del usuario y no automática:** registrar la ubicación donde se crea cada tarea podría leerse del enunciado como un dato automático de cada tarea, pero es una decisión de diseño deliberada pedirla solo cuando el usuario pulsa "Agregar ubicación", y solo en primer plano: es un dato sensible, la app no tiene ningún caso de uso que lo necesite de fondo (no hay notificaciones por cercanía ni backend que lo consuma), y pedirla en el momento deja clara para el usuario la relación entre la acción que toma y el permiso que se solicita.
 - **Retroalimentación háptica:** vibración de éxito al guardar una tarea y de advertencia al confirmar su eliminación (`expo-haptics`). En dispositivos sin soporte háptico no ocurre nada ni se muestra error.
-- **Permisos:** se solicitan solo en el momento de usar la función (cámara al abrir la cámara, ubicación al registrar la ubicación), nunca al iniciar la app. Los textos explicativos se declaran en `app.json`. Si el usuario rechaza un permiso, se muestra un mensaje claro bajo el control correspondiente (sin diálogos bloqueantes) y un botón "Abrir ajustes" (`Linking.openSettings()`). La galería se usa con el selector del sistema, que no requiere permiso de lectura.
+- **Permisos:** se solicitan solo en el momento de usar la función (cámara al abrir la cámara, ubicación al registrar la ubicación), nunca al iniciar la app. Los textos explicativos se declaran en `app.json`. Si el usuario rechaza un permiso, se muestra un mensaje claro bajo el control correspondiente (sin diálogos bloqueantes) y un botón "Abrir ajustes" (`Linking.openSettings()`). La galería se usa con el selector del sistema, que no requiere permiso de lectura. Ver los estados de permiso en [`2_DOMAIN.md`](./2_DOMAIN.md).
 - **Guardado siempre posible:** la tarea se puede guardar sin foto ni ubicación; un permiso rechazado, una cancelación o un fallo de GPS nunca bloquean el guardado.
 
 ## Modelo de datos
 
-Cada tarea contiene:
-
-| Campo         | Tipo     | Descripción                                                 |
-|---------------|----------|-------------------------------------------------------------|
-| `id`          | string   | Identificador único de la tarea                             |
-| `title`       | string   | Título breve de la tarea (obligatorio, máx. 80 caracteres)   |
-| `description` | string   | Descripción de la tarea (opcional, máx. 300 caracteres; puede ser cadena vacía) |
-| `createdAt`   | number   | Marca de tiempo de creación en milisegundos (`Date.now()`); la usa el ordenamiento por fecha |
-| `photoUri`    | string   | Opcional. URI local de la copia de la foto dentro de la carpeta de la app |
-| `location`    | `{ latitude: number; longitude: number; accuracy?: number }` | Opcional. Coordenadas donde se creó la tarea; `accuracy` es la precisión en metros y se omite si el dispositivo no la informa |
-| `address`     | string   | Opcional. Dirección legible obtenida con `reverseGeocodeAsync`; solo puede existir si hay `location` |
-
-Las tareas guardadas en la Unidad 1 no tienen `createdAt`: al cargarlas desde `AsyncStorage` se completa con `Number(id)` (los IDs se generaban con `Date.now()`), sin perder datos. Los campos opcionales se omiten (no se guardan como `null` ni cadena vacía) cuando no hay valor.
+El modelo `Task` y sus reglas de validación viven en [`2_DOMAIN.md`](./2_DOMAIN.md).
 
 ## Requerimientos técnicos
 
@@ -53,7 +44,9 @@ Las tareas guardadas en la Unidad 1 no tienen `createdAt`: al cargarlas desde `A
 - **Compatibilidad:** Android e iOS.
 - **APIs del dispositivo (Unidad 2):** `expo-image-picker`, `expo-file-system`, `expo-location`, `expo-haptics` y `Linking` de React Native, todas compatibles con Expo Go.
 - **Pruebas:** `jest-expo` con `@testing-library/react-native`; los módulos nativos se simulan (mocks).
-- **Sin servicios externos:** ninguna llamada de red propia ni API de terceros.
+- **Sin servicios externos:** ninguna llamada de red propia ni API de terceros; `location`, `address` y `photoUri` se guardan solo en el dispositivo. La dirección la resuelve `reverseGeocodeAsync` mediante el servicio de geocodificación del sistema operativo, que puede requerir conexión; si no está disponible se conservan solo las coordenadas.
+
+Detalle de dependencias y arquitectura en [`3_STACK.md`](./3_STACK.md).
 
 ## Criterios de aceptación
 
@@ -75,3 +68,5 @@ Las tareas guardadas en la Unidad 1 no tienen `createdAt`: al cargarlas desde `A
 16. Compatibilidad: todo funciona en Expo Go en Android e iOS, sin development build, y las tareas de la Unidad 1 se siguen cargando correctamente.
 17. Pruebas: `npm test` pasa e incluye los casos de permiso concedido, permiso rechazado, cancelación y timeout del GPS con los módulos nativos simulados.
 18. Documentación: el `README.md` documenta la Unidad 2 con capturas de pantalla, ya que es el informe de entrega.
+
+Estado de implementación de cada ítem (hecho / pendiente) en [`5_MVP.md`](./5_MVP.md).
