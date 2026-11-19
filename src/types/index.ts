@@ -15,3 +15,5 @@ export interface Task {
 }
 
 export type SortOrder = 'newest' | 'oldest' | 'alphabetical';
+
+export type PermissionStatus = 'undetermined' | 'granted' | 'denied' | 'blocked';

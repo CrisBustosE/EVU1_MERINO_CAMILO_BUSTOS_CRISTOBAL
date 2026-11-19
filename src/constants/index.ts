@@ -48,4 +48,5 @@ export const STRINGS = {
   sortNewest: 'Más recientes primero',
   sortOldest: 'Más antiguas primero',
   sortAlphabetical: 'Alfabético (A-Z)',
+  openSettings: 'Abrir ajustes',
 } as const;

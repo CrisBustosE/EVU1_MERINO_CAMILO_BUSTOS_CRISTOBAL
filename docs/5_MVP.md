@@ -10,12 +10,15 @@
 - Migración de tareas de la Unidad 1 (`src/utils/migrateTasks.ts` + test).
 - `useSortedTasks` ordenando por `createdAt`.
 - Configuración de Jest (`jest-expo`) con pruebas del reducer y de la migración.
+- Tipo compartido `PermissionStatus` (`src/types/index.ts`).
+- Servicio de permisos (`src/services/permissions.ts`) con pruebas.
+- Componente `PermissionNotice` (`src/components/PermissionNotice.tsx`) con pruebas.
 
 **Pendiente (no existe en el código todavía):**
 - Dependencias `expo-image-picker`, `expo-file-system`, `expo-location`, `expo-haptics` — no están en `package.json`.
-- Carpeta `src/services/` (fotos, ubicación, háptica, mapas, permisos) — no existe.
+- Carpeta `src/services/` (fotos, ubicación, háptica, mapas) — solo existe `permissions.ts`.
 - Hooks `usePhotoAttachment`, `useLocationCapture` — no existen.
-- Componentes `PhotoPicker`, `LocationField`, `PermissionNotice` — no existen.
+- Componentes `PhotoPicker`, `LocationField` — no existen.
 - Plugins y textos de permisos en `app.json` (`expo-image-picker`, `expo-location`) — `app.json` no los tiene configurados.
 - Campos `photoUri`, `location`, `address` están tipados en `Task` pero ningún flujo de UI los produce todavía.
 
