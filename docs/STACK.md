@@ -49,7 +49,7 @@ Navegación en pila gestionada por `@react-navigation/native-stack` con dos pant
 - Gestión local con `useReducer`; un reducer por dominio de datos, encapsulado en hooks (`useTasks`).
 - Persistencia con AsyncStorage: inicialización con acción `LOAD` tras parsear `STORAGE_KEY`, protección con flag `isLoaded` para evitar sobrescrituras de estado inicial vacío.
 - Modelo `Task`: `id`, `title`, `description`, `createdAt: number`, y opcionales `photoUri?: string`, `location?: { latitude: number; longitude: number; accuracy?: number }` (`accuracy` en metros), `address?: string`. Los opcionales se omiten cuando no hay valor.
-- Migración en `LOAD`: toda tarea sin `createdAt` (datos de la Unidad 1) lo recibe con `Number(id)`. `useSortedTasks` ordena por `createdAt`.
+- Migración en `src/utils/migrateTasks.ts`, aplicada en `useTasks` antes del `LOAD`: toda tarea sin `createdAt` (datos de la Unidad 1) lo recibe con `Number(id)`; si `Number(id)` no es finito, `createdAt = 0`. Se descartan las entradas sin `id` y `title` de tipo string. `useSortedTasks` ordena por `createdAt`.
 - Solo se persiste la **URI** de la foto en AsyncStorage; el archivo vive en la carpeta de documentos de la app. El archivo se borra al quitar/reemplazar la foto o eliminar la tarea.
 - Sin backend ni APIs externas.
 - IDs generados con `Date.now().toString()` o `Math.random()`; sin `uuid` ni similares.
@@ -76,7 +76,8 @@ src/
 ├── hooks/              # Custom hooks de lógica y estado (useTasks, useSortedTasks, usePhotoAttachment, useLocationCapture)
 ├── services/           # Acceso a módulos nativos del dispositivo (photoStorage, location, haptics, maps, permissions)
 ├── types/              # Interfaces y tipos compartidos (index.ts, navigation.ts)
-└── constants/          # Colores, tamaños, límites, timeouts y textos literales (STRINGS)
+├── constants/          # Colores, tamaños, límites, timeouts y textos literales (STRINGS)
+└── utils/              # Funciones puras sin dependencias de React (migrateTasks)
 ```
 
 Las pruebas viven junto al código que prueban, en carpetas `__tests__/` (`*.test.ts` / `*.test.tsx`). Los mocks compartidos de módulos nativos van en un archivo de setup referenciado desde la configuración de Jest.
