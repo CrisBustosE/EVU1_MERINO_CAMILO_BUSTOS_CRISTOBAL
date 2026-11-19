@@ -26,7 +26,7 @@ Todas se instalan con `npx expo install <paquete>` (nunca `npm install`) para ob
 - `expo-haptics` — retroalimentación háptica al guardar y eliminar.
 - `Linking` (de `react-native`, no requiere instalación) — abrir la ubicación en la app de mapas y los ajustes del sistema (`Linking.openSettings()`).
 
-Dependencias de desarrollo (`npx expo install --dev` o equivalente):
+Dependencias de desarrollo (instalar con `npx expo install` y luego verificar que queden en `devDependencies` de `package.json`; si no, moverlas a mano):
 
 - `jest` y `jest-expo` — ejecutor de pruebas con el preset oficial de Expo.
 - `@testing-library/react-native` — pruebas de componentes y hooks centradas en el comportamiento visible (y las peer dependencies que exija la versión instalada).
