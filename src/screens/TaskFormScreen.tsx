@@ -34,9 +34,11 @@ export default function TaskFormScreen({ route, navigation, onSave }: TaskFormSc
       return;
     }
     const task: Task = {
+      ...existing,
       id: existing?.id ?? Date.now().toString(),
       title: title.trim(),
       description: description.trim(),
+      createdAt: existing?.createdAt ?? Date.now(),
     };
     onSave(task);
     navigation.goBack();

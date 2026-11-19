@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { taskReducer } from '../reducers/taskReducer';
 import type { Task } from '../types';
 import { STORAGE_KEYS } from '../constants';
+import { migrateTasks } from '../utils/migrateTasks';
 
 export function useTasks() {
   const [tasks, dispatch] = useReducer(taskReducer, []);
@@ -13,16 +14,7 @@ export function useTasks() {
     async function loadTasks() {
       try {
         const raw = await AsyncStorage.getItem(STORAGE_KEYS.tasks);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed)) {
-            dispatch({ type: 'LOAD', payload: parsed });
-          } else {
-            dispatch({ type: 'LOAD', payload: [] });
-          }
-        } else {
-          dispatch({ type: 'LOAD', payload: [] });
-        }
+        dispatch({ type: 'LOAD', payload: migrateTasks(raw ? JSON.parse(raw) : []) });
       } catch {
         dispatch({ type: 'LOAD', payload: [] });
       } finally {
