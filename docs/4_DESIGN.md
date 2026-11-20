@@ -34,6 +34,7 @@
 | Componente | Responsabilidad |
 |---|---|
 | `PhotoPicker` | Botones "Tomar foto" / "Elegir de galería", miniatura y opción de quitar/reemplazar. |
+| `PhotoThumbnail` | Miniatura 56 × 56 dp reutilizada en `TaskItem` y `PhotoPicker`; muestra un placeholder si la imagen falla o el archivo no existe. |
 | `LocationField` | Botón "Agregar ubicación", muestra dirección o coordenadas, estado `busy`, botón para abrir en mapas y para quitar (antes de guardar). |
 | `PermissionNotice` | Mensaje inline + botón "Abrir ajustes" compartido por cámara y ubicación cuando el permiso está denegado o bloqueado. |
 

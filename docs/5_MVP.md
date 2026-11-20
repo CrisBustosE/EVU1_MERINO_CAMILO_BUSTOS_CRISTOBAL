@@ -2,7 +2,7 @@
 
 > Orden de lectura: este documento es el **5** de 5. Ver [`AGENTS.md`](../AGENTS.md) para el orden completo.
 
-## Estado actual (verificado contra el código en `main`, commit `80d39bd`)
+## Estado actual (verificado contra el código en la rama `feat/photo-attachment`)
 
 **Implementado:**
 - CRUD de tareas, validaciones, ordenamiento, persistencia, accesibilidad base (Unidad 1).
@@ -13,14 +13,14 @@
 - Tipo compartido `PermissionStatus` (`src/types/index.ts`).
 - Servicio de permisos (`src/services/permissions.ts`) con pruebas.
 - Componente `PermissionNotice` (`src/components/PermissionNotice.tsx`) con pruebas.
+- **Foto adjunta (cámara y galería):** dependencias `expo-image-picker` y `expo-file-system` instaladas; plugin y textos de permiso en `app.json`; servicios `src/services/photoPicker.ts` y `src/services/photoStorage.ts` (API nueva `File`/`Directory`/`Paths`); hook `src/hooks/usePhotoAttachment.ts`; componentes `PhotoPicker` y `PhotoThumbnail`; integración en `TaskFormScreen.tsx`, `TaskItem.tsx` y `useTasks.ts` (borrado del archivo al eliminar la tarea); todo con pruebas.
 
 **Pendiente (no existe en el código todavía):**
-- Dependencias `expo-image-picker`, `expo-file-system`, `expo-location`, `expo-haptics` — no están en `package.json`.
-- Carpeta `src/services/` (fotos, ubicación, háptica, mapas) — solo existe `permissions.ts`.
-- Hooks `usePhotoAttachment`, `useLocationCapture` — no existen.
-- Componentes `PhotoPicker`, `LocationField` — no existen.
-- Plugins y textos de permisos en `app.json` (`expo-image-picker`, `expo-location`) — `app.json` no los tiene configurados.
-- Campos `photoUri`, `location`, `address` están tipados en `Task` pero ningún flujo de UI los produce todavía.
+- Dependencia `expo-haptics` — no está en `package.json`.
+- Ubicación (`expo-location`): servicio, `useLocationCapture`, `LocationField`, abrir en mapas (`Linking`) — no existen.
+- Háptica (`expo-haptics`) al guardar y eliminar — no existe.
+- Plugin y textos de permiso de ubicación en `app.json` (`expo-location`) — no configurado.
+- Campos `location` y `address` están tipados en `Task` pero ningún flujo de UI los produce todavía.
 
 ## Reparto y orden de entrega
 
@@ -49,7 +49,8 @@ Ver [`3_STACK.md`](./3_STACK.md#definición-de-terminado). Resumen: criterios de
 | Escenario | Qué verificar |
 |---|---|
 | Permiso de cámara/ubicación **denegado** | Mensaje inline + botón "Abrir ajustes"; la app no se bloquea; se puede guardar sin la foto/ubicación. |
-| Permiso **bloqueado** (`canAskAgain: false`) | Mismo mensaje que denegado, sin volver a mostrar el diálogo nativo del sistema. |
+| Permiso **bloqueado** (`canAskAgain: false`) | Al pulsar de nuevo se reintenta la llamada a la API de permisos; si sigue rechazado, aparece el mismo mensaje que denegado + "Abrir ajustes". |
+| Cambiar el permiso de cámara a "Preguntar siempre" en los ajustes del sistema y volver a pulsar "Tomar foto" | El diálogo nativo vuelve a aparecer y, si se concede, se abre la cámara. |
 | **GPS apagado** en el dispositivo | El servicio de ubicación informa error/timeout en vez de colgarse; se puede reintentar o continuar sin ubicación. |
 | **Sin internet** | La app no depende de un backend propio; `reverseGeocodeAsync` usa el servicio de geocodificación del sistema operativo y puede fallar sin conexión, degradando a solo coordenadas. |
 | **Reabrir la app** con una tarea que tiene foto guardada | La miniatura sigue visible y el archivo sigue existiendo en la carpeta de documentos tras cerrar y reabrir Expo Go. |

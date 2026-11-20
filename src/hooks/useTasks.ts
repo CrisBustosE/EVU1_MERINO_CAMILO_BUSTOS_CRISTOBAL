@@ -4,6 +4,7 @@ import { taskReducer } from '../reducers/taskReducer';
 import type { Task } from '../types';
 import { STORAGE_KEYS } from '../constants';
 import { migrateTasks } from '../utils/migrateTasks';
+import { deletePhoto } from '../services/photoStorage';
 
 export function useTasks() {
   const [tasks, dispatch] = useReducer(taskReducer, []);
@@ -32,8 +33,10 @@ export function useTasks() {
   }, [tasks, isLoaded]);
 
   const deleteTask = useCallback((id: string) => {
+    const task = tasks.find((t) => t.id === id);
+    deletePhoto(task?.photoUri);
     dispatch({ type: 'DELETE', payload: id });
-  }, []);
+  }, [tasks]);
 
   const saveTask = useCallback((task: Task) => {
     const exists = tasks.find((t) => t.id === task.id);

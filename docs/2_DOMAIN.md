@@ -31,7 +31,7 @@ Modelo conceptual usado por cámara y ubicación (independiente de la API nativa
 | **Sin decidir** | El usuario nunca respondió al diálogo de permiso del sistema. |
 | **Concedido** | El usuario autorizó el acceso; la función puede usarse. |
 | **Denegado** | El usuario rechazó el permiso; se puede volver a pedir. |
-| **Bloqueado** | El usuario rechazó el permiso y el sistema ya no permite volver a pedirlo (`canAskAgain: false`). Se trata igual que **denegado** en la UI, pero sin reintentar el diálogo nativo: se muestra el mensaje y el botón "Abrir ajustes". |
+| **Bloqueado** | El usuario rechazó el permiso y el sistema informó que ya no permite volver a pedirlo (`canAskAgain: false`). Se trata igual que **denegado** en la UI: al pulsar de nuevo el botón, se vuelve a llamar a la API de permisos; si el sistema no puede mostrar el diálogo, devuelve el resultado al instante y se muestra el mensaje y el botón "Abrir ajustes". Esto permite que el permiso funcione si el usuario lo cambia en los ajustes del sistema (p. ej. a "Preguntar siempre"). |
 
 ## Migración de datos de la Unidad 1
 
@@ -50,6 +50,7 @@ Las tareas guardadas en la Unidad 1 no tienen `createdAt`. Al cargarlas desde `A
 3. La copia persiste aunque el archivo original (cámara o galería) se borre.
 4. La copia se borra del disco cuando: el usuario quita la foto, el usuario la reemplaza por otra, o la tarea se elimina. Al quitar la foto, `handleSave` debe guardar la tarea con `photoUri: undefined` de forma explícita (no basta con dejar de pasarlo), porque la tarea existente se arma con spread (`{ ...existing, ... }`) y un `photoUri` ausente en el objeto nuevo conservaría el valor anterior en vez de limpiarlo.
 5. El borrado es tolerante a archivo inexistente (no lanza error si ya no está).
+6. En la práctica (`usePhotoAttachment`), el archivo anterior de la tarea se borra recién al guardar (`commit`), no al elegir la nueva foto; si se sale sin guardar (`discard`, o desmontar sin commit), se borran las copias nuevas creadas en esa sesión y se conserva el archivo original.
 
 ## Privacidad
 
