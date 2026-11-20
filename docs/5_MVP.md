@@ -2,7 +2,7 @@
 
 > Orden de lectura: este documento es el **5** de 5. Ver [`AGENTS.md`](../AGENTS.md) para el orden completo.
 
-## Estado actual (verificado contra el código en la rama `feat/photo-attachment`)
+## Estado actual (verificado contra el código en la rama `feat/location`)
 
 **Implementado:**
 - CRUD de tareas, validaciones, ordenamiento, persistencia, accesibilidad base (Unidad 1).
@@ -14,13 +14,12 @@
 - Servicio de permisos (`src/services/permissions.ts`) con pruebas.
 - Componente `PermissionNotice` (`src/components/PermissionNotice.tsx`) con pruebas.
 - **Foto adjunta (cámara y galería):** dependencias `expo-image-picker` y `expo-file-system` instaladas; plugin y textos de permiso en `app.json`; servicios `src/services/photoPicker.ts` y `src/services/photoStorage.ts` (API nueva `File`/`Directory`/`Paths`); hook `src/hooks/usePhotoAttachment.ts`; componentes `PhotoPicker` y `PhotoThumbnail`; integración en `TaskFormScreen.tsx`, `TaskItem.tsx` y `useTasks.ts` (borrado del archivo al eliminar la tarea); todo con pruebas.
+- **Ubicación (GPS):** dependencia `expo-location` y plugin con texto de permiso en español en `app.json`; servicio `src/services/location.ts` (permiso solo en primer plano con la misma regla de bloqueado que la cámara, timeout con `LOCATION_TIMEOUT_MS`, `accuracy`, `reverseGeocodeAsync` con degradación a coordenadas); servicio `src/services/maps.ts` (`Linking`); hook `src/hooks/useLocationCapture.ts`; hook reutilizable `src/hooks/usePermissionRefresh.ts` (relee el permiso al volver a primer plano con el aviso visible; hoy lo usa solo `useLocationCapture`); componente `LocationField` (muestra dirección o coordenadas y precisión `± N m` si existe; solo lectura al editar y en la lista); integración en `TaskFormScreen.tsx` y `TaskItem.tsx`; todo con pruebas.
+- **Háptica:** dependencia `expo-haptics`; servicio `src/services/haptics.ts` (fallos ignorados en silencio); vibración de éxito al guardar (`TaskFormScreen`) y de advertencia al confirmar la eliminación (`TaskItem`); con pruebas.
 
-**Pendiente (no existe en el código todavía):**
-- Dependencia `expo-haptics` — no está en `package.json`.
-- Ubicación (`expo-location`): servicio, `useLocationCapture`, `LocationField`, abrir en mapas (`Linking`) — no existen.
-- Háptica (`expo-haptics`) al guardar y eliminar — no existe.
-- Plugin y textos de permiso de ubicación en `app.json` (`expo-location`) — no configurado.
-- Campos `location` y `address` están tipados en `Task` pero ningún flujo de UI los produce todavía.
+**Pendiente:**
+- `usePhotoAttachment` aún tiene su propio `AppState` para releer el permiso de cámara; podría migrar a `usePermissionRefresh` (responsable: Cristóbal).
+- README con capturas de la Unidad 2 (ver "Capturas necesarias para el README").
 
 ## Reparto y orden de entrega
 
