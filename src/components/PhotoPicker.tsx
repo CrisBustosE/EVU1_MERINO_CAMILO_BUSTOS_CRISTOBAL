@@ -25,7 +25,7 @@ export default function PhotoPicker({
   onRemovePhoto,
 }: PhotoPickerProps) {
   return (
-    <View style={styles.container}>
+    <View>
       <View style={styles.btnRow}>
         <TouchableOpacity
           style={[styles.btn, busy && styles.btnDisabled]}
@@ -78,9 +78,6 @@ export default function PhotoPicker({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    marginBottom: SPACING.md,
-  },
   btnRow: {
     flexDirection: 'row',
     gap: SPACING.sm,

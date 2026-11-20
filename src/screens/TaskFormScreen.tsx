@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  KeyboardAvoidingView,
+  ScrollView,
   Platform,
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types/navigation';
 import type { Task } from '../types';
 import { COLORS, SPACING, STRINGS, LIMITS } from '../constants';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import PhotoPicker from '../components/PhotoPicker';
 import { usePhotoAttachment } from '../hooks/usePhotoAttachment';
 import LocationField from '../components/LocationField';
@@ -29,6 +30,8 @@ export default function TaskFormScreen({ route, navigation, onSave }: TaskFormSc
   const [titleError, setTitleError] = useState(false);
   const photo = usePhotoAttachment(existing?.photoUri);
   const place = useLocationCapture({ location: existing?.location, address: existing?.address });
+  const insets = useSafeAreaInsets();
+  const descriptionRef = useRef<React.ComponentRef<typeof TextInput>>(null);
 
   function handleTitleChange(text: string) {
     setTitle(text);
@@ -57,9 +60,12 @@ export default function TaskFormScreen({ route, navigation, onSave }: TaskFormSc
   }
 
   return (
-    <KeyboardAvoidingView
+    <ScrollView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      contentContainerStyle={[styles.content, { paddingBottom: SPACING.md + insets.bottom }]}
+      keyboardShouldPersistTaps="handled"
+      keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
+      automaticallyAdjustKeyboardInsets
     >
       <View style={styles.labelRow}>
         <Text style={styles.label}>{STRINGS.titleLabel}</Text>
@@ -73,6 +79,8 @@ export default function TaskFormScreen({ route, navigation, onSave }: TaskFormSc
         onChangeText={handleTitleChange}
         maxLength={LIMITS.titleMaxLength}
         autoFocus
+        returnKeyType="next"
+        onSubmitEditing={() => descriptionRef.current?.focus()}
         accessibilityLabel={STRINGS.titleLabel}
       />
       {titleError && (
@@ -85,6 +93,7 @@ export default function TaskFormScreen({ route, navigation, onSave }: TaskFormSc
         <Text style={styles.counter}>{description.length}/{LIMITS.descMaxLength}</Text>
       </View>
       <TextInput
+        ref={descriptionRef}
         style={[styles.input, styles.multiline]}
         placeholder={STRINGS.descPlaceholder}
         placeholderTextColor={COLORS.textMuted}
@@ -96,43 +105,45 @@ export default function TaskFormScreen({ route, navigation, onSave }: TaskFormSc
         accessibilityLabel={STRINGS.descLabel}
       />
 
-      {/* Bloque de foto adjunta (Unidad 2) */}
-      <PhotoPicker
-        photoUri={photo.photoUri}
-        permissionStatus={photo.permissionStatus}
-        busy={photo.busy}
-        hasError={photo.error !== undefined}
-        onTakePhoto={photo.takePhoto}
-        onPickFromGallery={photo.pickFromGallery}
-        onRemovePhoto={photo.removePhoto}
-      />
-      <LocationField
-        location={place.location}
-        address={place.address}
-        permissionStatus={place.permissionStatus}
-        busy={place.busy}
-        error={place.error}
-        readOnly={existing !== undefined}
-        onAdd={place.capture}
-        onRemove={place.remove}
-      />
-      <View style={styles.btnRow}>
-        <TouchableOpacity
-          style={[styles.btn, styles.cancelBtn]}
-          onPress={() => navigation.goBack()}
-          accessibilityRole="button"
-        >
-          <Text style={styles.cancelText}>{STRINGS.cancel}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.btn, styles.saveBtn]}
-          onPress={handleSave}
-          accessibilityRole="button"
-        >
-          <Text style={styles.saveText}>{STRINGS.save}</Text>
-        </TouchableOpacity>
+      <View style={styles.blocks}>
+        {/* Bloque de foto adjunta (Unidad 2) */}
+        <PhotoPicker
+          photoUri={photo.photoUri}
+          permissionStatus={photo.permissionStatus}
+          busy={photo.busy}
+          hasError={photo.error !== undefined}
+          onTakePhoto={photo.takePhoto}
+          onPickFromGallery={photo.pickFromGallery}
+          onRemovePhoto={photo.removePhoto}
+        />
+        <LocationField
+          location={place.location}
+          address={place.address}
+          permissionStatus={place.permissionStatus}
+          busy={place.busy}
+          error={place.error}
+          readOnly={existing !== undefined}
+          onAdd={place.capture}
+          onRemove={place.remove}
+        />
+        <View style={styles.btnRow}>
+          <TouchableOpacity
+            style={[styles.btn, styles.cancelBtn]}
+            onPress={() => navigation.goBack()}
+            accessibilityRole="button"
+          >
+            <Text style={styles.cancelText}>{STRINGS.cancel}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.btn, styles.saveBtn]}
+            onPress={handleSave}
+            accessibilityRole="button"
+          >
+            <Text style={styles.saveText}>{STRINGS.save}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </KeyboardAvoidingView>
+    </ScrollView>
   );
 }
 
@@ -140,7 +151,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  content: {
     padding: SPACING.md,
+  },
+  // Separación vertical uniforme entre foto, ubicación y botones; los hijos no declaran margen propio.
+  blocks: {
+    gap: SPACING.md,
+    marginTop: SPACING.md,
   },
   labelRow: {
     flexDirection: 'row',
@@ -184,7 +202,6 @@ const styles = StyleSheet.create({
   },
   btnRow: {
     flexDirection: 'row',
-    marginTop: SPACING.lg,
     gap: SPACING.sm,
   },
   btn: {

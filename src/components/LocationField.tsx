@@ -96,7 +96,6 @@ export default function LocationField({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: SPACING.sm,
     alignItems: 'flex-start',
   },
   btnRow: {

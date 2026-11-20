@@ -17,6 +17,8 @@ jest.mock('../../services/haptics', () => ({
 }));
 
 import React from 'react';
+import { TextInput } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { captureLocation } from '../../services/location';
 import { hapticSuccess } from '../../services/haptics';
@@ -27,6 +29,11 @@ const mockedCaptureLocation = captureLocation as jest.MockedFunction<typeof capt
 
 type FormProps = React.ComponentProps<typeof TaskFormScreen>;
 
+const safeAreaMetrics = {
+  frame: { x: 0, y: 0, width: 360, height: 800 },
+  insets: { top: 0, left: 0, right: 0, bottom: 0 },
+};
+
 async function renderForm(task?: Task) {
   const goBack = jest.fn();
   const onSave = jest.fn();
@@ -35,12 +42,28 @@ async function renderForm(task?: Task) {
     navigation: { goBack },
     onSave,
   } as unknown as FormProps;
-  return { onSave, goBack, ...(await render(<TaskFormScreen {...props} />)) };
+  const view = await render(
+    <SafeAreaProvider initialMetrics={safeAreaMetrics}>
+      <TaskFormScreen {...props} />
+    </SafeAreaProvider>
+  );
+  return { onSave, goBack, ...view };
 }
 
 describe('TaskFormScreen: ubicación y háptica', () => {
   afterEach(() => {
     jest.clearAllMocks();
+  });
+
+  it('"siguiente" en el título pasa el foco a la descripción', async () => {
+    const focusSpy = jest.spyOn(TextInput.prototype, 'focus');
+    const { getByLabelText } = await renderForm();
+    focusSpy.mockClear();
+
+    await fireEvent(getByLabelText('Título'), 'submitEditing');
+
+    expect(focusSpy).toHaveBeenCalledTimes(1);
+    focusSpy.mockRestore();
   });
 
   it('guardar dispara la háptica de éxito', async () => {
