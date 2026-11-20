@@ -12,6 +12,8 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types/navigation';
 import type { Task } from '../types';
 import { COLORS, SPACING, STRINGS, LIMITS } from '../constants';
+import PhotoPicker from '../components/PhotoPicker';
+import { usePhotoAttachment } from '../hooks/usePhotoAttachment';
 
 interface TaskFormScreenProps extends NativeStackScreenProps<RootStackParamList, 'TaskForm'> {
   onSave: (task: Task) => void;
@@ -22,6 +24,7 @@ export default function TaskFormScreen({ route, navigation, onSave }: TaskFormSc
   const [title, setTitle] = useState(existing?.title ?? '');
   const [description, setDescription] = useState(existing?.description ?? '');
   const [titleError, setTitleError] = useState(false);
+  const photo = usePhotoAttachment(existing?.photoUri);
 
   function handleTitleChange(text: string) {
     setTitle(text);
@@ -39,8 +42,10 @@ export default function TaskFormScreen({ route, navigation, onSave }: TaskFormSc
       title: title.trim(),
       description: description.trim(),
       createdAt: existing?.createdAt ?? Date.now(),
+      photoUri: photo.photoUri,
     };
     onSave(task);
+    photo.commit(photo.photoUri);
     navigation.goBack();
   }
 
@@ -82,6 +87,17 @@ export default function TaskFormScreen({ route, navigation, onSave }: TaskFormSc
         numberOfLines={4}
         maxLength={LIMITS.descMaxLength}
         accessibilityLabel={STRINGS.descLabel}
+      />
+
+      {/* Bloque de foto adjunta (Unidad 2) */}
+      <PhotoPicker
+        photoUri={photo.photoUri}
+        permissionStatus={photo.permissionStatus}
+        busy={photo.busy}
+        hasError={photo.error !== undefined}
+        onTakePhoto={photo.takePhoto}
+        onPickFromGallery={photo.pickFromGallery}
+        onRemovePhoto={photo.removePhoto}
       />
       <View style={styles.btnRow}>
         <TouchableOpacity

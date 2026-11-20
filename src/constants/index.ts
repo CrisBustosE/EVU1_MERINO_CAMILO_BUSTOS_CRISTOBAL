@@ -49,4 +49,11 @@ export const STRINGS = {
   sortOldest: 'Más antiguas primero',
   sortAlphabetical: 'Alfabético (A-Z)',
   openSettings: 'Abrir ajustes',
+  takePhoto: 'Tomar foto',
+  pickFromGallery: 'Elegir de galería',
+  removePhoto: 'Quitar foto',
+  photoPermissionHint: 'Se usará solo para adjuntar la foto a esta tarea.',
+  cameraPermissionDenied: 'No se puede acceder a la cámara. Puedes elegir una foto de la galería o abrir ajustes para permitir el acceso.',
+  photoThumbnailLabel: 'Foto adjunta de la tarea',
+  photoError: 'No se pudo adjuntar la foto. Inténtalo de nuevo.',
 } as const;

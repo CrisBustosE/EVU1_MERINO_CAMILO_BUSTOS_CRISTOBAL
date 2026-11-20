@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import type { Task } from '../types';
 import { COLORS, SPACING, STRINGS } from '../constants';
+import PhotoThumbnail from './PhotoThumbnail';
 
 interface TaskItemProps {
   task: Task;
@@ -51,6 +52,10 @@ export default function TaskItem({ task, onEdit, onDelete }: TaskItemProps) {
   return (
     <>
       <View style={styles.container}>
+        {/* Miniatura de foto adjunta (Unidad 2) */}
+        {task.photoUri && (
+          <PhotoThumbnail uri={task.photoUri} accessibilityLabel={STRINGS.photoThumbnailLabel} />
+        )}
         <View style={styles.contentContainer}>
           {/* Textos visibles con truncado condicional */}
           <Text
