@@ -29,6 +29,12 @@
           "photosPermission": "Se usará la galería para elegir una foto para esta tarea.",
           "microphonePermission": false
         }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Se usará tu ubicación solo para registrar dónde creaste esta tarea."
+        }
       ]
     ]
   }

@@ -11,6 +11,8 @@ import {
 import type { Task } from '../types';
 import { COLORS, SPACING, STRINGS } from '../constants';
 import PhotoThumbnail from './PhotoThumbnail';
+import LocationField from './LocationField';
+import { hapticWarning } from '../services/haptics';
 
 interface TaskItemProps {
   task: Task;
@@ -108,6 +110,8 @@ export default function TaskItem({ task, onEdit, onDelete }: TaskItemProps) {
               </Text>
             </TouchableOpacity>
           )}
+
+          {task.location && <LocationField location={task.location} address={task.address} readOnly />}
         </View>
 
         <View style={styles.actions}>
@@ -164,6 +168,7 @@ export default function TaskItem({ task, onEdit, onDelete }: TaskItemProps) {
                 style={[styles.btn, styles.deleteBtn]}
                 onPress={() => {
                   setConfirmVisible(false);
+                  hapticWarning();
                   onDelete(task.id);
                 }}
                 accessibilityRole="button"

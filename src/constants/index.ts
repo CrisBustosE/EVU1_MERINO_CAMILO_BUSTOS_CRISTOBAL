@@ -23,6 +23,9 @@ export const STORAGE_KEYS = {
   tasks: '@tasks_storage_key',
 } as const;
 
+// Tiempo máximo de espera del GPS: getCurrentPositionAsync no tiene timeout propio.
+export const LOCATION_TIMEOUT_MS = 15000;
+
 export const STRINGS = {
   appTitle: 'Mis Tareas',
   addTask: 'Nueva tarea',
@@ -56,4 +59,14 @@ export const STRINGS = {
   cameraPermissionDenied: 'No se puede acceder a la cámara. Puedes elegir una foto de la galería o abrir ajustes para permitir el acceso.',
   photoThumbnailLabel: 'Foto adjunta de la tarea',
   photoError: 'No se pudo adjuntar la foto. Inténtalo de nuevo.',
+  addLocation: 'Agregar ubicación',
+  removeLocation: 'Quitar ubicación',
+  openInMaps: 'Abrir en mapas',
+  locationPermissionHint: 'Se usará solo para registrar dónde se creó esta tarea.',
+  locationPermissionDenied: 'No se puede acceder a la ubicación. Puedes guardar la tarea sin ella o abrir ajustes para permitir el acceso.',
+  locationTimeout: 'El GPS no respondió a tiempo. Inténtalo de nuevo o guarda la tarea sin ubicación.',
+  locationError: 'No se pudo obtener la ubicación. Inténtalo de nuevo o guarda la tarea sin ubicación.',
+  locationLabel: 'Ubicación de la tarea',
+  locationAccuracyPrefix: '± ',
+  locationAccuracySuffix: ' m',
 } as const;

@@ -14,6 +14,9 @@ import type { Task } from '../types';
 import { COLORS, SPACING, STRINGS, LIMITS } from '../constants';
 import PhotoPicker from '../components/PhotoPicker';
 import { usePhotoAttachment } from '../hooks/usePhotoAttachment';
+import LocationField from '../components/LocationField';
+import { useLocationCapture } from '../hooks/useLocationCapture';
+import { hapticSuccess } from '../services/haptics';
 
 interface TaskFormScreenProps extends NativeStackScreenProps<RootStackParamList, 'TaskForm'> {
   onSave: (task: Task) => void;
@@ -25,6 +28,7 @@ export default function TaskFormScreen({ route, navigation, onSave }: TaskFormSc
   const [description, setDescription] = useState(existing?.description ?? '');
   const [titleError, setTitleError] = useState(false);
   const photo = usePhotoAttachment(existing?.photoUri);
+  const place = useLocationCapture({ location: existing?.location, address: existing?.address });
 
   function handleTitleChange(text: string) {
     setTitle(text);
@@ -43,7 +47,10 @@ export default function TaskFormScreen({ route, navigation, onSave }: TaskFormSc
       description: description.trim(),
       createdAt: existing?.createdAt ?? Date.now(),
       photoUri: photo.photoUri,
+      location: place.location,
+      address: place.address,
     };
+    hapticSuccess();
     onSave(task);
     photo.commit(photo.photoUri);
     navigation.goBack();
@@ -98,6 +105,16 @@ export default function TaskFormScreen({ route, navigation, onSave }: TaskFormSc
         onTakePhoto={photo.takePhoto}
         onPickFromGallery={photo.pickFromGallery}
         onRemovePhoto={photo.removePhoto}
+      />
+      <LocationField
+        location={place.location}
+        address={place.address}
+        permissionStatus={place.permissionStatus}
+        busy={place.busy}
+        error={place.error}
+        readOnly={existing !== undefined}
+        onAdd={place.capture}
+        onRemove={place.remove}
       />
       <View style={styles.btnRow}>
         <TouchableOpacity
