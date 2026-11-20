@@ -261,6 +261,155 @@ En nuestras pruebas en Android, observamos que al definir `numberOfLines`, el ev
 2. **Persistencia del criterio de orden:** el ordenamiento seleccionado en `SortMenu` se mantiene durante la sesión activa en memoria, pero no se guarda en `AsyncStorage`, volviendo a "más recientes" al reabrir la app.
 3. **Categorización o etiquetas por tarea:** incorporar etiquetas de colores o categorías (ej. "Trabajo", "Personal", "Urgente") para facilitar la organización de volúmenes mayores de tareas.
 
+## Unidad 2: APIs del dispositivo
+
+En esta unidad la app suma cuatro APIs internas del dispositivo: foto adjunta, ubicación con mapas, háptica y permisos. Todo funciona en Expo Go, sin development build.
+
+### Alcance
+
+El profesor indicó que solo se evalúan las APIs internas del dispositivo (no servicios web) y que el README es el informe de entrega. Por eso la app no tiene backend ni llamadas de red propias.
+
+La pauta pide plugins de Capacitor, que son para apps web dentro de un WebView. Como el proyecto es React Native, usamos los módulos de Expo equivalentes:
+
+| Plugin de Capacitor | Módulo de Expo usado | ¿Lo pide la pauta? | Justificación |
+|---|---|---|---|
+| `@capacitor/camera` | `expo-image-picker` | Sí | Abre la cámara y la galería con los selectores del sistema; la galería no requiere permiso de lectura. |
+| `@capacitor/geolocation` | `expo-location` | Sí | Posición actual con permiso solo en primer plano y `reverseGeocodeAsync` para la dirección legible. |
+| `@capacitor/filesystem` | `expo-file-system` | No, agregado nuestro | Copia la foto a la carpeta de documentos de la app para que persista aunque se borre el original. |
+| `@capacitor/haptics` | `expo-haptics` | No, agregado nuestro | Vibración de éxito al guardar y de advertencia al eliminar. |
+
+Para abrir la app de mapas y los ajustes del sistema se usa `Linking` de React Native, que no requiere instalación.
+
+### Funcionalidades
+
+#### Foto adjunta
+
+<!-- Cristóbal completa esta parte -->
+
+#### Ubicación y mapas
+
+Al crear una tarea, el botón "Agregar ubicación" pide la posición actual (`expo-location`). Con ella se guardan `location` (latitud, longitud y precisión en metros) y `address`, la dirección legible que entrega `reverseGeocodeAsync`.
+
+- **A pedido del usuario:** la ubicación se registra solo cuando se pulsa el botón, nunca al abrir la app. Es un dato sensible y la app no tiene ningún caso de uso que la necesite en segundo plano.
+- **Tolerante a fallos:** si el GPS no responde en 15 segundos (`LOCATION_TIMEOUT_MS`) se muestra un mensaje y se puede reintentar o guardar sin ubicación. Si falla la geocodificación, por ejemplo sin internet, se conservan solo las coordenadas.
+- **Opcional y editable solo al crear:** se puede quitar antes de guardar. Al editar una tarea, la ubicación es de solo lectura.
+- **Abrir en mapas:** el botón "Abrir en mapas" aparece en el formulario y en la lista. Entrega las coordenadas a la app de mapas del dispositivo con `maps:` en iOS y `geo:` en Android.
+
+| Formulario (solo lectura al editar) | Lista de tareas | Apple Maps |
+|:---:|:---:|:---:|
+| <img src="docs/screenshots/u2-ubicacion-formulario.jpeg" width="180"> | <img src="docs/screenshots/u2-ubicacion-lista.jpeg" width="180"> | <img src="docs/screenshots/u2-abrir-mapas.jpeg" width="180"> |
+
+| Permiso rechazado | Modo avión (solo coordenadas) |
+|:---:|:---:|
+| <img src="docs/screenshots/u2-permiso-rechazado.jpeg" width="180"> | <img src="docs/screenshots/u2-modo-avion.jpeg" width="180"> |
+
+En modo avión el GPS sigue funcionando, pero la geocodificación no: la tarea se guarda con las coordenadas (`-29.96961, -71.25180 ± 4 m`) en lugar de la dirección.
+
+#### Háptica
+
+`expo-haptics` da retroalimentación al usuario en dos acciones (`src/services/haptics.ts`):
+
+- **Guardar una tarea:** vibración de éxito (`Success`), solo si el formulario es válido.
+- **Confirmar la eliminación:** vibración de advertencia (`Warning`), solo si se pulsa "Eliminar" en el modal; cancelar no vibra.
+
+En dispositivos sin soporte háptico el error se ignora en silencio: no pasa nada ni se muestra un mensaje.
+
+#### Arreglos del formulario
+
+Al agregar los bloques de foto y ubicación, el formulario de `src/screens/TaskFormScreen.tsx` creció y el teclado empezó a tapar los controles. Se corrigió así:
+
+- `KeyboardAvoidingView` se reemplazó por un `ScrollView` con `automaticallyAdjustKeyboardInsets` y `keyboardShouldPersistTaps="handled"`: el contenido se desplaza sobre el teclado y los botones siguen funcionando con el teclado abierto.
+- La tecla "siguiente" del título pasa el foco a la descripción.
+- El padding inferior suma el inset de la safe area (`useSafeAreaInsets`) para que los botones no queden bajo la barra del sistema.
+- Foto, ubicación y botones comparten una separación vertical uniforme con `gap` en un solo contenedor, en vez de márgenes sueltos en cada hijo.
+
+### Permisos y privacidad
+
+- **Bajo demanda:** ningún permiso se pide al iniciar la app. Se piden al pulsar "Agregar ubicación" (o al usar la cámara) y bajo cada botón hay un texto que explica para qué se usará. Los textos que muestra el sistema se declaran en español en `app.json`; el de ubicación es "Se usará tu ubicación solo para registrar dónde creaste esta tarea."
+- **Solo en primer plano:** la ubicación usa `requestForegroundPermissionsAsync`; no se usa ubicación en segundo plano.
+- **Estados de permiso:** `PermissionStatus` distingue sin decidir, concedido, denegado y bloqueado (`canAskAgain: false`). La interfaz trata denegado y bloqueado igual: al pulsar de nuevo se vuelve a llamar a la API de permisos, y si el sistema no puede mostrar el diálogo, responde al instante y se muestra el aviso. Así el permiso funciona si el usuario lo cambia en los ajustes.
+- **Aviso con "Abrir ajustes":** `PermissionNotice` muestra un mensaje inline, sin diálogos bloqueantes, y un botón que llama a `Linking.openSettings()`. La app sigue usable y la tarea se puede guardar sin ubicación.
+- **`usePermissionRefresh`** (`src/hooks/usePermissionRefresh.ts`): al volver a primer plano con el aviso visible, relee el permiso del sistema. Si el usuario lo activó en los ajustes, el aviso desaparece solo, sin reiniciar la app.
+- **Datos solo en el dispositivo:** `location`, `address` y `photoUri` se guardan en `AsyncStorage` y nunca se envían a un servidor, porque la app no tiene backend. La única salida es `reverseGeocodeAsync`, que usa el servicio de geocodificación del sistema operativo.
+
+**Normativa chilena.** Hoy rige la [Ley 19.628, sobre protección de la vida privada](https://www.bcn.cl/leychile/navegar?idNorma=141599), que será reemplazada por la [Ley 21.719, que regula la protección y el tratamiento de los datos personales](https://www.bcn.cl/leychile/navegar?idNorma=1209272) (Biblioteca del Congreso Nacional). La app sigue los principios de esa normativa:
+
+- **Finalidad:** la ubicación se usa solo para registrar dónde se creó la tarea, y así se informa al usuario antes de pedirla.
+- **Minimización de datos:** solo se guarda lo necesario (coordenadas, precisión y dirección), nada en segundo plano y nada que el usuario no haya pedido.
+- **Consentimiento:** el dato se obtiene únicamente cuando el usuario pulsa el botón y acepta el permiso del sistema; puede quitarlo antes de guardar.
+
+<!-- Cristóbal: agregar aquí lo de la cámara (permiso, copia de la foto y borrado del archivo) -->
+
+### Arquitectura
+
+El acceso a los módulos nativos está aislado en una capa de servicios; las pantallas y los componentes nunca importan `expo-*`.
+
+```
+src/
+├── services/    location.ts, maps.ts, haptics.ts, permissions.ts: único lugar que importa expo-location, expo-haptics y Linking
+├── hooks/       useLocationCapture.ts, usePermissionRefresh.ts: estado y flujo de la función, sobre los servicios
+├── components/  LocationField.tsx, PermissionNotice.tsx: UI pura
+└── screens/     TaskFormScreen.tsx: compone hooks y componentes
+```
+
+- **Capa de servicios:** `captureLocation()` pide el permiso, obtiene la posición con timeout (`Promise.race`) y resuelve la dirección. `openInMaps()` y las funciones de `haptics.ts` encapsulan `Linking` y `expo-haptics`.
+- **Hooks:** `useLocationCapture` guarda `location`, `address`, el estado del permiso, `busy` y el error. `TaskFormScreen` solo consume ese estado.
+- **Resultados tipados:** los servicios no lanzan excepciones hacia la interfaz; devuelven una unión discriminada que el hook traduce a estado y a mensajes de `STRINGS`:
+
+```typescript
+export type LocationCaptureResult =
+  | { status: 'ok'; location: TaskLocation; address?: string }
+  | { status: 'denied' | 'blocked' }
+  | { status: 'timeout' }
+  | { status: 'error' };
+```
+
+- **Dependency Inversion:** las pantallas y los componentes dependen de hooks y servicios propios (`useLocationCapture`, `openInMaps`, `hapticSuccess`), no de `expo-*`. Por eso en las pruebas se simulan los módulos nativos o los servicios sin tocar la interfaz, y cambiar de librería solo afectaría a `src/services/`.
+
+### Pruebas
+
+`npm test` ejecuta **127 pruebas en 18 suites** con `jest-expo` y `@testing-library/react-native`. Los módulos nativos (`expo-location`, `expo-haptics`, `Linking`, `AsyncStorage`) se simulan con `jest.mock`, así que ninguna prueba usa hardware ni red. De ellas, 60 cubren ubicación y háptica:
+
+| Archivo | Pruebas | Casos |
+|---|:---:|---|
+| `src/services/__tests__/location.test.ts` | 11 | Permiso concedido, denegado y bloqueado (con reintento del request), timeout del GPS, error del GPS, `accuracy` nulo, dirección compuesta desde sus partes, fallo y timeout de `reverseGeocodeAsync` |
+| `src/services/__tests__/maps.test.ts` | 3 | URL `geo:` en Android, `maps:` en iOS, sin app de mapas |
+| `src/services/__tests__/haptics.test.ts` | 3 | Éxito, advertencia y dispositivo sin soporte háptico |
+| `src/hooks/__tests__/useLocationCapture.test.ts` | 10 | Captura exitosa, `busy`, permiso denegado y bloqueado, timeout y reintento, error del GPS, geocodificación fallida, quitar, ubicación inicial al editar |
+| `src/hooks/__tests__/usePermissionRefresh.test.ts` | 6 | Relee al volver a primer plano solo con el aviso visible, usa el estado más reciente, elimina la suscripción al desmontar |
+| `src/components/__tests__/LocationField.test.tsx` | 13 | Agregar, `busy`, dirección o coordenadas, precisión, abrir en mapas, quitar, aviso de permiso, errores de timeout y GPS, modo solo lectura |
+| `src/components/__tests__/TaskItem.test.tsx` | 5 | Háptica de advertencia al confirmar (y no al cancelar), ubicación en la lista con y sin dirección |
+| `src/screens/__tests__/TaskFormScreen.test.tsx` | 9 | Háptica de éxito solo con título válido, guardar con y sin ubicación, permiso rechazado no impide guardar, quitar ubicación, solo lectura al editar, foco "siguiente" |
+
+<!-- Pegar aquí la captura de `npx jest --coverage` (por ejemplo docs/screenshots/u2-cobertura.png) -->
+
+**Pruebas manuales en iPhone 14 con Expo Go:**
+
+| Escenario | Qué se verificó | Resultado |
+|---|---|:---:|
+| Agregar ubicación | Al pulsar "Agregar ubicación" aparece el diálogo del sistema; al aceptar se muestran la dirección y la precisión, y quedan guardadas en la tarea | Aprobada |
+| Abrir en Apple Maps | "Abrir en mapas" desde la lista y el formulario abre Apple Maps con el punto de la tarea | Aprobada |
+| Vibración al guardar y eliminar | Vibra al guardar una tarea válida y al confirmar la eliminación; no vibra al cancelar | Aprobada |
+| Edición de solo lectura | Al editar una tarea con ubicación se ve la dirección y "Abrir en mapas", sin "Agregar" ni "Quitar" | Aprobada |
+| Permiso rechazado | Aparece el mensaje inline con "Abrir ajustes"; la app no se bloquea y se puede guardar sin ubicación | Aprobada |
+| Permiso activado desde ajustes | Tras activarlo en los ajustes y volver a la app, el aviso desaparece y la ubicación se puede agregar | Aprobada |
+| Modo avión | Se obtiene la posición, pero sin dirección: se guardan y muestran solo las coordenadas | Aprobada |
+| Teclado del formulario | El teclado no tapa los campos ni los botones, el formulario se desplaza y "siguiente" pasa a la descripción | Aprobada |
+
+<!-- Cristóbal: agregar aquí la tabla de pruebas manuales en Android -->
+
+### Proceso
+
+Trabajo en ramas y Pull Requests en GitHub, con commits según Conventional Commits. El responsable es quien escribió los commits del PR.
+
+| PR | Rama | Responsable | Contenido |
+|:---:|---|---|---|
+| #3 | `chore/evu2-setup` | Camilo | Alcance de la Unidad 2 en el brief y el stack, modelo `Task` con `createdAt`, `photoUri`, `location` y `address`, y configuración de Jest |
+| #4 | `docs/evu2-5-docs` | Cristóbal | Documentación reorganizada en 5 archivos numerados (`docs/1_BRIEF.md` a `docs/5_MVP.md`) |
+| #5 | `feat/permissions-base` | Cristóbal | Base compartida de permisos: tipo `PermissionStatus`, servicio `permissions.ts` y componente `PermissionNotice` |
+| #6 | `feat/photo-attachment` | Cristóbal | Foto adjunta con cámara y galería: `expo-image-picker`, `expo-file-system`, `PhotoPicker` y `usePhotoAttachment` |
+| #7 | `feat/location` | Camilo | Ubicación, mapas y háptica, `usePermissionRefresh` y arreglos del teclado en el formulario (pendiente de fusionar) |
+
 ## Uso de agentes de IA
 
 Usamos agentes de IA como herramienta de apoyo durante el desarrollo, siguiendo una metodología estructurada: antes de escribir cualquier línea de código, establecimos el flujo de control en [`AGENTS.md`](AGENTS.md), obligando a que cualquier intervención leyera y respetara estrictamente los requisitos de [`docs/1_BRIEF.md`](docs/1_BRIEF.md) y las convenciones arquitectónicas de [`docs/3_STACK.md`](docs/3_STACK.md).
