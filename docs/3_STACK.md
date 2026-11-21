@@ -74,7 +74,7 @@ src/
 ├── components/         # Componentes reutilizables (UI puro: TaskItem, SortMenu, PhotoPicker, LocationField, PermissionNotice)
 ├── screens/            # Una pantalla por archivo (TaskListScreen, TaskFormScreen)
 ├── reducers/           # Reducers y tipos de acción
-├── hooks/              # Custom hooks de lógica y estado (useTasks, useSortedTasks, usePhotoAttachment, useLocationCapture)
+├── hooks/              # Custom hooks de lógica y estado (useTasks, useSortedTasks, usePhotoAttachment, useLocationCapture, usePermissionRefresh)
 ├── services/            # Acceso a módulos nativos del dispositivo (photoStorage, location, haptics, maps, permissions)
 ├── types/              # Interfaces y tipos compartidos (index.ts, navigation.ts)
 ├── constants/          # Colores, tamaños, límites, timeouts y textos literales (STRINGS)
