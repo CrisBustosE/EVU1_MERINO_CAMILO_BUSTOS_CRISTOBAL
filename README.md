@@ -1,4 +1,4 @@
-# To-Do List — EVU1 Desarrollo de Aplicaciones Móviles
+# To-Do List — EVU1 y EVU2 Desarrollo de Aplicaciones Móviles
 
 Aplicación móvil de lista de tareas desarrollada con **React Native + Expo** y **TypeScript**. Permite agregar, editar y eliminar tareas con título y descripción (Unidad 1) y, además, adjuntar una foto con cámara o galería, registrar la ubicación donde se creó la tarea con acceso directo a mapas, y recibir retroalimentación háptica, todo con permisos pedidos solo bajo demanda (Unidad 2).
 
@@ -7,6 +7,8 @@ Aplicación móvil de lista de tareas desarrollada con **React Native + Expo** y
 ## ¿Por qué React Native + Expo?
 
 Aunque la pauta original de la evaluación proponía Ionic como referencia, el profesor permitió elegir libremente el stack tecnológico del proyecto. Elegimos React Native con Expo principalmente porque el equipo ya tenía experiencia previa con React, lo que nos permitió enfocarnos en la lógica, accesibilidad y calidad de la aplicación en vez de aprender un framework desde cero. A diferencia de Ionic, que ejecuta la interfaz dentro de un WebView, React Native genera vistas nativas reales tanto en Android como en iOS desde una única base de código. Además, Expo y su flujo managed nos permitieron probar la app directamente en nuestros teléfonos mediante Expo Go, sin requerir la configuración pesada de Android Studio ni Xcode. Por último, es un stack con alta demanda en la industria, por lo que el aprendizaje resulta aplicable a escenarios profesionales reales.
+
+## Funcionalidades
 
 - Agregar, editar y eliminar tareas (con confirmación antes de borrar).
 - Validación del título obligatorio y contadores de caracteres (título 80, descripción 300).
@@ -265,7 +267,7 @@ En nuestras pruebas en Android, observamos que al definir `numberOfLines`, el ev
 
 ## Unidad 2: APIs del dispositivo
 
-En esta unidad la app suma cuatro APIs internas del dispositivo: foto adjunta, ubicación con mapas, háptica y permisos. Todo funciona en Expo Go, sin development build.
+En esta unidad la app suma cuatro funcionalidades que usan APIs internas del dispositivo: foto adjunta, ubicación con mapas, háptica y permisos. Todo funciona en Expo Go, sin development build.
 
 ### Alcance
 
@@ -306,9 +308,17 @@ Al crear una tarea, el botón "Agregar ubicación" pide la posición actual (`ex
 - **Opcional y editable solo al crear:** se puede quitar antes de guardar. Al editar una tarea, la ubicación es de solo lectura.
 - **Abrir en mapas:** el botón "Abrir en mapas" aparece en el formulario y en la lista. Entrega las coordenadas a la app de mapas del dispositivo con `maps:` en iOS y `geo:` en Android.
 
+**iOS (iPhone 14)**
+
 | Formulario (solo lectura al editar) | Lista de tareas | Apple Maps |
 |:---:|:---:|:---:|
 | <img src="docs/screenshots/u2-ubicacion-formulario.jpeg" width="180"> | <img src="docs/screenshots/u2-ubicacion-lista.jpeg" width="180"> | <img src="docs/screenshots/u2-abrir-mapas.jpeg" width="180"> |
+
+| Permiso rechazado | Modo avión (solo coordenadas) |
+|:---:|:---:|
+| <img src="docs/screenshots/u2-permiso-rechazado.jpeg" width="180"> | <img src="docs/screenshots/u2-modo-avion.jpeg" width="180"> |
+
+**Android (Samsung)**
 
 | Ubicación agregada (Android, simulada) | Abrir en mapas (Android) |
 |:---:|:---:|
@@ -420,20 +430,26 @@ export type LocationCaptureResult =
 
 <img src="docs/screenshots/u2-jest-coverage.png" width="500">
 
-Cobertura global: 91,96 % sentencias, 85,78 % ramas, 86,95 % funciones y 92,71 % líneas. El archivo menos cubierto es `TaskItem.tsx` (55,55 % sentencias): `TaskItem.test.tsx` sí prueba la háptica de advertencia al confirmar la eliminación y la ubicación en la lista (con y sin dirección), pero no ejercita directamente `handleTitleMeasurement`/`handleDescMeasurement` (líneas 34-36 y 41-43, el cálculo de líneas truncadas vía `onTextLayout`), `toggleExpand` (líneas 48-49, el toggle "Ver más"/"Ver menos"), el `onPress` del botón "Editar" (línea 120) ni el cierre del modal de confirmación desde el fondo u `onRequestClose` (líneas 143 y 145).
+Cobertura global: 91,96 % sentencias, 85,78 % ramas, 86,95 % funciones y 92,71 % líneas.
+
+Las pruebas en iOS las hizo Camilo (iPhone 14) y las de Android, Cristóbal (Samsung).
 
 **Pruebas manuales en iPhone 14 con Expo Go:**
 
-| Escenario | Qué se verificó | Resultado |
-|---|---|:---:|
-| Agregar ubicación | Al pulsar "Agregar ubicación" aparece el diálogo del sistema; al aceptar se muestran la dirección y la precisión, y quedan guardadas en la tarea | Aprobada |
-| Abrir en Apple Maps | "Abrir en mapas" desde la lista y el formulario abre Apple Maps con el punto de la tarea | Aprobada |
-| Vibración al guardar y eliminar | Vibra al guardar una tarea válida y al confirmar la eliminación; no vibra al cancelar | Aprobada |
-| Edición de solo lectura | Al editar una tarea con ubicación se ve la dirección y "Abrir en mapas", sin "Agregar" ni "Quitar" | Aprobada |
-| Permiso rechazado | Aparece el mensaje inline con "Abrir ajustes"; la app no se bloquea y se puede guardar sin ubicación | Aprobada |
-| Permiso activado desde ajustes | Tras activarlo en los ajustes y volver a la app, el aviso desaparece y la ubicación se puede agregar | Aprobada |
-| Modo avión | Se obtiene la posición, pero sin dirección: se guardan y muestran solo las coordenadas | Aprobada |
-| Teclado del formulario | El teclado no tapa los campos ni los botones, el formulario se desplaza y "siguiente" pasa a la descripción | Aprobada |
+| Escenario | Qué se verificó | Captura | Resultado |
+|---|---|:---:|:---:|
+| Agregar ubicación | Al pulsar "Agregar ubicación" aparece el diálogo del sistema; al aceptar se muestran la dirección y la precisión, y quedan guardadas en la tarea | `u2-ubicacion-formulario.jpeg` | Aprobada |
+| Abrir en Apple Maps | "Abrir en mapas" desde la lista y el formulario abre Apple Maps con el punto de la tarea | `u2-abrir-mapas.jpeg` | Aprobada |
+| Vibración al guardar y eliminar | Vibra al guardar una tarea válida y al confirmar la eliminación; no vibra al cancelar | Sin captura | Aprobada |
+| Edición de solo lectura | Al editar una tarea con ubicación se ve la dirección y "Abrir en mapas", sin "Agregar" ni "Quitar" | Sin captura | Aprobada |
+| Permiso rechazado | Aparece el mensaje inline con "Abrir ajustes"; la app no se bloquea y se puede guardar sin ubicación | `u2-permiso-rechazado.jpeg` | Aprobada |
+| Permiso activado desde ajustes | Tras activarlo en los ajustes y volver a la app, el aviso desaparece y la ubicación se puede agregar | Sin captura | Aprobada |
+| Modo avión | Se obtiene la posición, pero sin dirección: se guardan y muestran solo las coordenadas | `u2-modo-avion.jpeg` | Aprobada |
+| Teclado del formulario | El teclado no tapa los campos ni los botones, el formulario se desplaza y "siguiente" pasa a la descripción | Sin captura | Aprobada |
+| Diálogo de permiso de cámara | Al pulsar "Tomar foto" por primera vez aparece el diálogo nativo del sistema | Sin captura | Aprobada |
+| Permiso de cámara rechazado | Aparece el aviso inline con "Abrir ajustes"; la app no se bloquea y se puede guardar sin foto | Sin captura | Aprobada |
+| Foto en el formulario y en la lista | La foto se ve en el formulario antes de guardar y como miniatura en la lista | Sin captura | Aprobada |
+| Foto persiste tras reabrir Expo Go | Al cerrar Expo Go por completo y volver a abrir la app, la miniatura sigue visible | Sin captura | Aprobada |
 
 **Pruebas manuales en Android (Samsung, Expo Go):**
 
@@ -451,7 +467,7 @@ Cobertura global: 91,96 % sentencias, 85,78 % ramas, 86,95 % funciones y 92,71 %
 | Foto persiste tras reabrir Expo Go | Al cerrar Expo Go por completo y volver a abrir la app, la miniatura sigue visible | Sin Captura | Aprobada |
 | Permiso de cámara activado desde ajustes | Tras activarlo en los ajustes del sistema y volver a la app, el aviso desaparece solo, sin reiniciar la app | Sin Captura | Aprobada |
 
-La ubicación de las capturas fue **simulada** con coordenadas de una plaza pública (por eso la precisión se ve como "± 0 m"); no corresponde a la ubicación real del dispositivo de prueba. Además, la cámara del equipo Android usado para las pruebas tiene una falla de enfoque conocida, por lo que las fotos de las capturas salen desenfocadas; esto es una limitación del hardware de prueba, no del código. La prueba en iOS (tabla de arriba) la hizo Camilo en un iPhone 14; Cristóbal no alcanzó a probar la cámara en un dispositivo iOS.
+En las capturas de Android, la ubicación fue simulada con coordenadas de una plaza pública.
 
 ### Proceso
 
@@ -464,13 +480,8 @@ Trabajo en ramas y Pull Requests en GitHub, con commits según Conventional Comm
 | #5 | `feat/permissions-base` | Cristóbal | Base compartida de permisos: tipo `PermissionStatus`, servicio `permissions.ts` y componente `PermissionNotice` |
 | #6 | `feat/photo-attachment` | Cristóbal | Foto adjunta con cámara y galería: `expo-image-picker`, `expo-file-system`, `PhotoPicker` y `usePhotoAttachment` |
 | #7 | `feat/location` | Camilo | Ubicación, mapas y háptica, `usePermissionRefresh` |
-| #9 | `fix/android-keyboard` | Cristóbal | Pie fijo (`FormActions` + `useKeyboardHeight`) para que "Cancelar"/"Guardar" queden sobre el teclado en Android |
 | #8 | `docs/evu2-readme` | Camilo y Cristóbal | README de la Unidad 2: foto, cámara y permisos, capturas en Android, cobertura de pruebas y este PR |
-
-### Pendientes conocidos
-
-- `usePhotoAttachment` tiene su propio `AppState` para releer el permiso de cámara; podría migrar a `usePermissionRefresh` (el hook reutilizable que ya usa `useLocationCapture`), eliminando la duplicación.
-- Cobertura de `TaskItem.tsx` (55,55 % sentencias): faltan pruebas directas sobre `handleTitleMeasurement`/`handleDescMeasurement` (truncado vía `onTextLayout`), el toggle "Ver más"/"Ver menos" (`toggleExpand`), el botón "Editar" y el cierre del modal de confirmación desde el fondo o con `onRequestClose`.
+| #9 | `fix/android-keyboard` | Cristóbal | Pie fijo (`FormActions` + `useKeyboardHeight`) para que "Cancelar"/"Guardar" queden sobre el teclado en Android |
 
 ## Uso de agentes de IA
 

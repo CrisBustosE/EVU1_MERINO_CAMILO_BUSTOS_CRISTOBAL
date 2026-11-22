@@ -2,7 +2,7 @@
 
 > Orden de lectura: este documento es el **5** de 5. Ver [`AGENTS.md`](../AGENTS.md) para el orden completo.
 
-## Estado actual (verificado contra el código en la rama `feat/location`)
+## Estado actual (verificado contra `main`)
 
 **Implementado:**
 - CRUD de tareas, validaciones, ordenamiento, persistencia, accesibilidad base (Unidad 1).
@@ -19,7 +19,6 @@
 
 **Pendiente:**
 - `usePhotoAttachment` aún tiene su propio `AppState` para releer el permiso de cámara; podría migrar a `usePermissionRefresh` (responsable: Cristóbal).
-- README con capturas de la Unidad 2 (ver "Capturas necesarias para el README").
 
 ## Reparto y orden de entrega
 
