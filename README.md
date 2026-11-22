@@ -430,7 +430,7 @@ export type LocationCaptureResult =
 
 <img src="docs/screenshots/u2-jest-coverage.png" width="500">
 
-Cobertura global: 91,96 % sentencias, 85,78 % ramas, 86,95 % funciones y 92,71 % líneas. El archivo menos cubierto es `TaskItem.tsx` (55,55 % sentencias): `TaskItem.test.tsx` sí prueba la háptica de advertencia al confirmar la eliminación y la ubicación en la lista (con y sin dirección), pero no ejercita directamente `handleTitleMeasurement`/`handleDescMeasurement` (líneas 34-36 y 41-43, el cálculo de líneas truncadas vía `onTextLayout`), `toggleExpand` (líneas 48-49, el toggle "Ver más"/"Ver menos"), el `onPress` del botón "Editar" (línea 120) ni el cierre del modal de confirmación desde el fondo u `onRequestClose` (líneas 143 y 145).
+Cobertura global: 91,96 % sentencias, 85,78 % ramas, 86,95 % funciones y 92,71 % líneas.
 
 Las pruebas en iOS las hizo Camilo (iPhone 14) y las de Android, Cristóbal (Samsung).
 
@@ -467,7 +467,7 @@ Las pruebas en iOS las hizo Camilo (iPhone 14) y las de Android, Cristóbal (Sam
 | Foto persiste tras reabrir Expo Go | Al cerrar Expo Go por completo y volver a abrir la app, la miniatura sigue visible | Sin Captura | Aprobada |
 | Permiso de cámara activado desde ajustes | Tras activarlo en los ajustes del sistema y volver a la app, el aviso desaparece solo, sin reiniciar la app | Sin Captura | Aprobada |
 
-La ubicación de las capturas fue **simulada** con coordenadas de una plaza pública (por eso la precisión se ve como "± 0 m"); no corresponde a la ubicación real del dispositivo de prueba. Además, la cámara del equipo Android usado para las pruebas tiene una falla de enfoque conocida, por lo que las fotos de las capturas salen desenfocadas; esto es una limitación del hardware de prueba, no del código.
+En las capturas de Android, la ubicación fue simulada con coordenadas de una plaza pública.
 
 ### Proceso
 
@@ -482,11 +482,6 @@ Trabajo en ramas y Pull Requests en GitHub, con commits según Conventional Comm
 | #7 | `feat/location` | Camilo | Ubicación, mapas y háptica, `usePermissionRefresh` |
 | #8 | `docs/evu2-readme` | Camilo y Cristóbal | README de la Unidad 2: foto, cámara y permisos, capturas en Android, cobertura de pruebas y este PR |
 | #9 | `fix/android-keyboard` | Cristóbal | Pie fijo (`FormActions` + `useKeyboardHeight`) para que "Cancelar"/"Guardar" queden sobre el teclado en Android |
-
-### Pendientes conocidos
-
-- `usePhotoAttachment` tiene su propio `AppState` para releer el permiso de cámara; podría migrar a `usePermissionRefresh` (el hook reutilizable que ya usa `useLocationCapture`), eliminando la duplicación.
-- Cobertura de `TaskItem.tsx` (55,55 % sentencias): faltan pruebas directas sobre `handleTitleMeasurement`/`handleDescMeasurement` (truncado vía `onTextLayout`), el toggle "Ver más"/"Ver menos" (`toggleExpand`), el botón "Editar" y el cierre del modal de confirmación desde el fondo o con `onRequestClose`.
 
 ## Uso de agentes de IA
 
